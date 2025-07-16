@@ -1,17 +1,13 @@
-import { useState } from 'react'
-import { Button } from '@chakra-ui/react'
 
-import './App.css'
-
+import Filterbar from "./components/Filters/Filterbar"
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <h1>Vite + React</h1>
-      <Button onClick={() => setCount((count) => count + 1)}>
-        count is {count}
-      </Button>
+      <Filterbar />
+      
+      
+
     </>
   )
 }
