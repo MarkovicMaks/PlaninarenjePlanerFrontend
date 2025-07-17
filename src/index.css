@@ -92,3 +92,8 @@ button:focus-visible {
   width: 100%;
   height: 10%;
 }
+
+.leaflet-routing-container-hide{
+  width: 300px !important;   /* or whatever size you want */
+  height: auto !important;
+}

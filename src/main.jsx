@@ -5,6 +5,7 @@ import './index.css'
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>

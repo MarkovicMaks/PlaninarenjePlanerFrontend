@@ -1,43 +1,29 @@
-import { MapContainer, TileLayer, FeatureGroup } from "react-leaflet";
-import { EditControl } from "react-leaflet-draw";
-import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
+import { MapContainer, TileLayer } from 'react-leaflet';
+import RoutingMachine from './RoutingMachine.jsx';
+import 'leaflet/dist/leaflet.css';
 
 const InicialMap = () => {
-  const handleCreated = (e) => {
-    const { layerType, layer } = e;
-    if (layerType === "polyline") {
-      const latlngs = layer.getLatLngs();
-      console.log("New trail:", latlngs);
-    }
+  /* ----- callbacks ----- */
+  const handleRouteReady = (geojson, distanceKm) => {
+    console.log('Auto-route ready:', geojson, distanceKm);
+    // TODO: save to state or POST to backend
   };
 
+  /* ----- ui ----- */
   return (
-    <div style={{ height: "90%", width: "80vw" }}>
+    <div style={{ height: '90%', width: '80vw' }}>
       <MapContainer
-        center={[45.7774, 15.6521]} // Ošterccc
+        center={[45.7774, 15.6521]} /* Ošterc peak */
         zoom={15}
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
+          attribution="© OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <FeatureGroup>
-          <EditControl
-            position="topright"
-            draw={{
-              polyline: true,
-              polygon: false,
-              rectangle: false,
-              circle: false,
-              marker: false,
-              circlemarker: false,
-            }}
-            edit={{ remove: true }}
-            onCreated={handleCreated}
-          />
-        </FeatureGroup>
+
+        {/* -- AUTO-ROUTE only -- */}
+        <RoutingMachine onRouteReady={handleRouteReady} />
       </MapContainer>
     </div>
   );
