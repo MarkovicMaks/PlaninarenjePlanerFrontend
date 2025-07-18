@@ -1,66 +1,57 @@
-// src/components/Map/RoutingMachine.jsx
-import { useEffect } from "react";
-import { useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet-routing-machine";
-import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
-import "lrm-graphhopper";
+import { useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet-routing-machine';                      // adds L.Routing
+import 'lrm-graphhopper';                              // adds L.Routing.graphHopper
 
-export default function RoutingMachine({ onRouteReady }) {
+import React from 'react';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+
+
+function RoutingMachine({ apiKey, onRouteFound }) {
   const map = useMap();
 
-  useEffect(() => {
-    // 1. Create the control with GraphHopper walking profile
-    const control = L.Routing.control({
-      waypoints: [],
-      position: "topright",
-      addWaypoints: true,
-      draggableWaypoints: true,
-      routeWhileDragging: true,
-      show: true,
-      collapsible: false,
-      router: L.Routing.graphHopper("YOUR_GRAPHOPPER_API_KEY", {
-        profile: "foot", // or 'hike', 'bike', etc.
+  React.useEffect(() => {
+    if (!map) return;
+
+    // Initialize the routing control with GraphHopper (foot profile)
+    const routingControl = L.Routing.control({
+      waypoints: [],  // start with no waypoints
+      router: L.Routing.graphHopper(apiKey, {  // use GraphHopper routing backend
+        urlParameters: { vehicle: 'foot' }     // specify foot (hiking) profile:contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
       }),
-      lineOptions: { styles: [{ color: "#1E90FF", weight: 4 }] },
+      autoRoute: true,
+      routeWhileDragging: false,
+      addWaypoints: false,       // disable dragging to add new waypoints by line
+      show: false                // do not show the itinerary panel
     }).addTo(map);
 
-    // 🔄 LOG when a routing request actually starts
-    control.on("routingstart", () => {
-      console.log("Routing calculation started…");
+    // On each click, add a new waypoint and recompute route
+    map.on('click', (e) => {
+      const waypoints = routingControl.getWaypoints().map(wp => wp.latLng).filter(Boolean);
+      waypoints.push(e.latlng);
+      routingControl.setWaypoints(waypoints);
     });
 
-    // ✅ LOG + callback when a route is found
-    control.on("routesfound", (e) => {
-      console.log("Route found (GraphHopper)", e);
+    // Listen for route results to retrieve GeoJSON and distance
+    routingControl.on('routesfound', function(e) {
       const route = e.routes[0];
-      const coords = route.coordinates.map((c) => [c.lng, c.lat]);
-      const geojson = { type: "LineString", coordinates: coords };
-      const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
-      onRouteReady(geojson, distanceKm);
+      const { totalDistance, totalTime } = route.summary;  // in meters and seconds:contentReference[oaicite:2]{index=2}:contentReference[oaicite:3]{index=3}
+      const geojson = {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: route.coordinates.map(coord => [coord.lng, coord.lat])  // convert to [lng, lat]
+        },
+        properties: { totalDistance, totalTime }
+      };
+      onRouteFound?.(geojson, totalDistance);
     });
 
-    // ❌ LOG if GraphHopper returns an error
-    control.on("routingerror", (e) => {
-      console.error("Routing error:", e.error || e);
-    });
-
-    /* -------- manual click-to-add waypoints (your original code) ------- */
-    let clickCount = 0;
-    const addWp = (e) => {
-      console.log(
-        "Adding waypoint, GraphHopper service URL =",
-        control.options.router.options.serviceUrl
-      );
-      control.spliceWaypoints(clickCount++, 0, e.latlng);
-    };
-    map.on("click", addWp);
-
-    return () => {
-      map.off("click", addWp);
-      map.removeControl(control);
-    };
-  }, [map, onRouteReady]);
+    return () => map.removeControl(routingControl);
+  }, [map, apiKey, onRouteFound]);
 
   return null;
 }
+
+export default RoutingMachine;

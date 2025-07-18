@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 
 const InicialMap = () => {
   /* ----- callbacks ----- */
-  const handleRouteReady = (geojson, distanceKm) => {
+  const handleRouteResult = (geojson, distanceKm) => {
     console.log('Auto-route ready:', geojson, distanceKm);
     // TODO: save to state or POST to backend
   };
@@ -23,7 +23,7 @@ const InicialMap = () => {
         />
 
         {/* -- AUTO-ROUTE only -- */}
-        <RoutingMachine onRouteReady={handleRouteReady} />
+        <RoutingMachine apiKey={'15cd8335-e008-4c2b-a710-2b01581ac01e'} onRouteFound={handleRouteResult} />
       </MapContainer>
     </div>
   );
