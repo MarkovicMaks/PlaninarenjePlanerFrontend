@@ -14,7 +14,6 @@ function RoutingMachine({ apiKey, onRouteFound }) {
   React.useEffect(() => {
     if (!map) return;
 
-    // Initialize the routing control with GraphHopper (foot profile)
     const routingControl = L.Routing.control({
       waypoints: [],  // start with no waypoints
       router: L.Routing.graphHopper(apiKey, {  // use GraphHopper routing backend

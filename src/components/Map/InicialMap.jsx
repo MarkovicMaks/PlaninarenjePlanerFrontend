@@ -4,8 +4,10 @@ import 'leaflet/dist/leaflet.css';
 
 const InicialMap = () => {
   /* ----- callbacks ----- */
-  const handleRouteResult = (geojson, distanceKm) => {
-    console.log('Auto-route ready:', geojson, distanceKm);
+  const handleRouteResult = (geojson, distM, ascendM, descendM) => {
+    console.log(
+      `Distance: ${(distM / 1000).toFixed(2)} km  |  ↗︎ ${ascendM} m  ↘︎ ${descendM} m |  Duration: ${Math.round(geojson.properties.totalTime / 60)} min`
+    );
     // TODO: save to state or POST to backend
   };
 
