@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
-import { Box, Heading, Button, VStack, Text, Link } from '@chakra-ui/react';
+import {
+  Box,
+  Heading,
+  Input,
+  Button,
+  VStack,
+  Text,
+  Link,
+  Field,
+} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
-export default function LoginPage() {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
+
     // TODO: replace with real authentication logic
     if (email === 'user@example.com' && password === 'password') {
-      // on successful login, redirect
       navigate('/');
     } else {
       setError('Invalid email or password');
@@ -21,14 +30,32 @@ export default function LoginPage() {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt={12} p={6} borderWidth={1} borderRadius="lg" boxShadow="lg">
+    <Box maxW="md" mx="auto" mt={12} p={6} borderWidth="1px" borderRadius="lg" boxShadow="lg">
       <Heading as="h2" size="lg" textAlign="center" mb={6}>
         Log In
       </Heading>
 
       <form onSubmit={handleSubmit}>
         <VStack spacing={4}>
-          
+          <Field.Root required>
+            <Field.Label>Email address</Field.Label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </Field.Root>
+
+          <Field.Root required>
+            <Field.Label>Password</Field.Label>
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+            />
+          </Field.Root>
 
           {error && (
             <Text color="red.500" fontSize="sm" textAlign="center">

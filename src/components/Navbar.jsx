@@ -1,3 +1,4 @@
+
 import {
   Box,
   Flex,
@@ -7,29 +8,40 @@ import {
   Stack,
   Button,
   Icon,
-} from '@chakra-ui/react'
-import { Menu, X } from 'lucide-react'
+  Link as ChakraLink,
+} from '@chakra-ui/react';
+import { Menu, X } from 'lucide-react';
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function Navbar() {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Box bg="#99DDC8" px={4} color="white">
       <Flex h={16} alignItems="center" justifyContent="space-between">
-        <Box fontWeight="bold"></Box>
+        <Box fontWeight="bold">MyApp</Box>
 
-        <HStack spacing={8} alignItems="center" display={{ base: 'none', md: 'flex' }}>
-          <Button >Home</Button>
-          <Button >About</Button>
-          <Button >Contact</Button>
+        <HStack
+          as="nav"
+          spacing={8}
+          alignItems="center"
+          display={{ base: 'none', md: 'flex' }}
+        >
+          <Button as={RouterLink} to="/" className='NavbarButton'>
+            Home
+          </Button>
+          <Button as={RouterLink} to="/login" className='NavbarButton'>
+            Login
+          </Button>
+          <Button as={RouterLink} to="/signup" className='NavbarButton'>
+            Sign Up
+          </Button>
         </HStack>
 
         <IconButton
           size="md"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
-          icon={
-            <Icon as={isOpen ? X : Menu} boxSize={5} />   
-          }
+          icon={<Icon as={isOpen ? X : Menu} boxSize={5} />}
           display={{ md: 'none' }}
           onClick={isOpen ? onClose : onOpen}
         />
@@ -38,12 +50,18 @@ export default function Navbar() {
       {isOpen && (
         <Box pb={4} display={{ md: 'none' }}>
           <Stack as="nav" spacing={4}>
-            <Button >Home</Button>
-            <Button >About</Button>
-            <Button >Contact</Button>
+            <Button as={RouterLink} to="/" variant="ghost">
+              Home
+            </Button>
+            <Button as={RouterLink} to="/login" variant="ghost">
+              Login
+            </Button>
+            <Button as={RouterLink} to="/signup" variant="ghost">
+              Sign Up
+            </Button>
           </Stack>
         </Box>
       )}
     </Box>
-  )
+  );
 }

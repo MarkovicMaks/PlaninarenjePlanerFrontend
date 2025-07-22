@@ -93,6 +93,18 @@ button:focus-visible {
   height: 10%;
 }
 
+.NavbarButton{
+  color: #ffffff;
+  background: transparent;
+  text-decoration: none;
+}
+
+.NavbarButton:hover {
+  color: #ffffff;
+  background: #95BF74;
+  text-decoration: none;
+}
+
 .leaflet-routing-container-hide{
   width: 300px !important;   /* or whatever size you want */
   height: auto !important;
