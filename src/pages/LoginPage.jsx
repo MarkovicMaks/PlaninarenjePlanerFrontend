@@ -35,7 +35,7 @@ export default function Login() {
       <Navbar />
     <div className="LoginPage">
       
-    <Box maxW="md" mx="auto" mt={12} p={6} borderWidth="1px" borderRadius="lg" boxShadow="lg" background={'#95BF74'}>
+    <Box maxW="md" mx="auto" mt={12} p={6} borderWidth="1px" borderRadius="lg" boxShadow="lg" background={'#659B5E'}>
       <Heading as="h2" size="lg" textAlign="center" mb={6}>
         Log In
       </Heading>

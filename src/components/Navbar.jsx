@@ -17,7 +17,7 @@ export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box bg="#99DDC8" px={4} color="white">
+    <Box bg="#99ddc8ff" px={4} color="white">
       <Flex h={16} alignItems="center" justifyContent="space-between">
         <Box fontWeight="bold">MyApp</Box>
 

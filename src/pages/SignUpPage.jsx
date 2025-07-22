@@ -50,7 +50,7 @@ export default function Signup() {
           borderWidth="1px"
           borderRadius="lg"
           boxShadow="lg"
-          background="#95BF74"
+          background="#659B5E"
           width="60%"
         >
           <Heading as="h2" size="lg" textAlign="center" mb={6}>

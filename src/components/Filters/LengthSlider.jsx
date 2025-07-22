@@ -1,10 +1,11 @@
 import { Slider } from "@chakra-ui/react";
 function LengthSlider() {
   return (
-    <Slider.Root>
+    <Slider.Root margin={4} defaultValue={[10]} min={1} max={50}>
       <div>
-        <Slider.Label>Daljina puta</Slider.Label>
+        <Slider.Label>Daljina puta </Slider.Label>
         <Slider.ValueText />
+        <Slider.Label>km</Slider.Label>
       </div>
       <Slider.Control>
         <Slider.Track>

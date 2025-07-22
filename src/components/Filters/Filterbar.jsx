@@ -5,6 +5,9 @@ function Filterbar() {
       <h1>PlaniPlaer</h1>
       <br />
       <LengthSlider />
+      <LengthSlider />
+      <LengthSlider />
+      <LengthSlider />
     </div>
   );
 }
