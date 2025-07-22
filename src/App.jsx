@@ -2,6 +2,7 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
 // import other pages as you create them, e.g.:
 // import About from "./pages/About";
 
@@ -13,7 +14,7 @@ export default function App() {
 
       {/* Example of another route */}
       <Route path="/Login" element={<LoginPage />} />
-
+      <Route path="/Signup" element={<SignupPage />} />
       {/* Optionally a “catch-all” 404: */}
       {/* <Route path="*" element={<NotFound />} /> */}
     </Routes>

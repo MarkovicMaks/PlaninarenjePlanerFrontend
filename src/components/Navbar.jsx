@@ -33,7 +33,7 @@ export default function Navbar() {
           <Button as={RouterLink} to="/login" className='NavbarButton'>
             Login
           </Button>
-          <Button as={RouterLink} to="/signup" className='NavbarButton'>
+          <Button as={RouterLink} to="/Signup" className='NavbarButton'>
             Sign Up
           </Button>
         </HStack>

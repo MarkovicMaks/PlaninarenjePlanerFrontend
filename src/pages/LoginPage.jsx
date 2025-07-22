@@ -10,6 +10,7 @@ import {
   Field,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar.jsx';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -30,7 +31,11 @@ export default function Login() {
   };
 
   return (
-    <Box maxW="md" mx="auto" mt={12} p={6} borderWidth="1px" borderRadius="lg" boxShadow="lg">
+    <>
+      <Navbar />
+    <div className="LoginPage">
+      
+    <Box maxW="md" mx="auto" mt={12} p={6} borderWidth="1px" borderRadius="lg" boxShadow="lg" background={'#95BF74'}>
       <Heading as="h2" size="lg" textAlign="center" mb={6}>
         Log In
       </Heading>
@@ -76,5 +81,7 @@ export default function Login() {
         </VStack>
       </form>
     </Box>
+    </div>
+    </>
   );
 }
