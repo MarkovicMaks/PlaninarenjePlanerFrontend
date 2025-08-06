@@ -1,4 +1,3 @@
-// useGeolocation.js
 import { useEffect, useState } from "react";
 
 export default function GeoLocate() {

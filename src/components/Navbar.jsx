@@ -42,7 +42,9 @@ export default function Navbar() {
             <>
               {isAuthenticated ? (
                 <>
-                  <Text fontSize="sm">Welcome, {user?.fullName}!</Text>
+                  <Button as={RouterLink} to="/profile" variant="ghost" className='NavbarButton'>
+                      {user?.fullName}
+                    </Button>
                   <Button 
                     leftIcon={<Icon as={LogOut} />}
                     onClick={handleLogout}
@@ -86,7 +88,9 @@ export default function Navbar() {
               <>
                 {isAuthenticated ? (
                   <>
-                    <Text fontSize="sm">Welcome, {user?.fullName}!</Text>
+                    <Button as={RouterLink} to="/profile" variant="ghost">
+                      {user?.fullName}
+                    </Button>
                     <Button 
                       leftIcon={<Icon as={LogOut} />}
                       onClick={handleLogout}
@@ -103,6 +107,7 @@ export default function Navbar() {
                     <Button as={RouterLink} to="/signup" variant="ghost">
                       Sign Up
                     </Button>
+                    
                   </>
                 )}
               </>

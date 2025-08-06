@@ -1,6 +1,6 @@
 // src/components/Map/InicialMap.jsx
 import { useState, useEffect, useCallback } from "react";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import RoutingMachine from "./RoutingMachine.jsx";
 import "leaflet/dist/leaflet.css";
 
@@ -25,7 +25,7 @@ function useGeolocation() {
       (e) => setErr(e.message),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
-       
+
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
@@ -78,7 +78,11 @@ const InicialMap = ({ onRouteInfo }) => {
           attribution="© OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-
+        {pos && (
+          <Marker position={[pos.lat, pos.lng]}>
+            <Popup>Vi ste ovdje</Popup>
+          </Marker>
+        )}
         {/* fly once permission granted */}
         <FlyToUser pos={pos} />
 
