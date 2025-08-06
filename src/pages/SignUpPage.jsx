@@ -10,31 +10,58 @@ import {
   Field,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.jsx';
 import Navbar from '../components/Navbar.jsx';
 
 export default function Signup() {
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
+    // Validate passwords match
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    // TODO: replace with real sign‑up logic (API call, etc.)
-    if (name && email && password) {
-      // pretend sign‑up succeeded
-      navigate('/');
-    } else {
+    // Validate required fields
+    if (!fullName || !email || !password) {
       setError('All fields are required');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await signup({
+        fullName,
+        email,
+        password,
+      });
+      navigate('/'); // Redirect to home page
+    } catch (error) {
+      console.error('Signup error:', error);
+      
+      // Handle different error types
+      if (error.response?.status === 400) {
+        setError(error.response.data.message || 'Invalid data provided');
+      } else if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError('Signup failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,9 +90,10 @@ export default function Signup() {
                 <Field.Label>Full Name</Field.Label>
                 <Input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
+                  disabled={loading}
                 />
               </Field.Root>
 
@@ -76,6 +104,7 @@ export default function Signup() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
+                  disabled={loading}
                 />
               </Field.Root>
 
@@ -86,6 +115,7 @@ export default function Signup() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter a strong password"
+                  disabled={loading}
                 />
               </Field.Root>
 
@@ -96,6 +126,7 @@ export default function Signup() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re‑enter your password"
+                  disabled={loading}
                 />
               </Field.Root>
 
@@ -105,7 +136,13 @@ export default function Signup() {
                 </Text>
               )}
 
-              <Button type="submit" colorScheme="teal" width="full">
+              <Button 
+                type="submit" 
+                colorScheme="teal" 
+                width="full"
+                isLoading={loading}
+                loadingText="Creating account..."
+              >
                 Create Account
               </Button>
 

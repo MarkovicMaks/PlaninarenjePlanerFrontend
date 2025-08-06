@@ -1,4 +1,3 @@
-
 import {
   Box,
   Flex,
@@ -8,18 +7,26 @@ import {
   Stack,
   Button,
   Icon,
-  Link as ChakraLink,
+  Text,
 } from '@chakra-ui/react';
-import { Menu, X } from 'lucide-react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Menu, X, LogOut } from 'lucide-react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { user, isAuthenticated, logout, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <Box bg="#99ddc8ff" px={4} color="white">
       <Flex h={16} alignItems="center" justifyContent="space-between">
-        <Box fontWeight="bold">MyApp</Box>
+        <Box fontWeight="bold">Hiking Planner</Box>
 
         <HStack
           as="nav"
@@ -30,12 +37,33 @@ export default function Navbar() {
           <Button as={RouterLink} to="/" className='NavbarButton'>
             Home
           </Button>
-          <Button as={RouterLink} to="/login" className='NavbarButton'>
-            Login
-          </Button>
-          <Button as={RouterLink} to="/Signup" className='NavbarButton'>
-            Sign Up
-          </Button>
+          
+          {!loading && (
+            <>
+              {isAuthenticated ? (
+                <>
+                  <Text fontSize="sm">Welcome, {user?.fullName}!</Text>
+                  <Button 
+                    leftIcon={<Icon as={LogOut} />}
+                    onClick={handleLogout}
+                    className='NavbarButton'
+                    variant="outline"
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button as={RouterLink} to="/login" className='NavbarButton'>
+                    Login
+                  </Button>
+                  <Button as={RouterLink} to="/signup" className='NavbarButton'>
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </>
+          )}
         </HStack>
 
         <IconButton
@@ -53,12 +81,32 @@ export default function Navbar() {
             <Button as={RouterLink} to="/" variant="ghost">
               Home
             </Button>
-            <Button as={RouterLink} to="/login" variant="ghost">
-              Login
-            </Button>
-            <Button as={RouterLink} to="/signup" variant="ghost">
-              Sign Up
-            </Button>
+            
+            {!loading && (
+              <>
+                {isAuthenticated ? (
+                  <>
+                    <Text fontSize="sm">Welcome, {user?.fullName}!</Text>
+                    <Button 
+                      leftIcon={<Icon as={LogOut} />}
+                      onClick={handleLogout}
+                      variant="ghost"
+                    >
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button as={RouterLink} to="/login" variant="ghost">
+                      Login
+                    </Button>
+                    <Button as={RouterLink} to="/signup" variant="ghost">
+                      Sign Up
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
           </Stack>
         </Box>
       )}
