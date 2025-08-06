@@ -16,6 +16,7 @@ export default function App() {
       <Route path="/Login" element={<LoginPage />} />
       <Route path="/Signup" element={<SignupPage />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/trails" element={<TrailListPage />} />
       {/* Optionally a “catch-all” 404: */}
       {/* <Route path="*" element={<NotFound />} /> */}
     </Routes>
