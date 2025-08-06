@@ -1,16 +1,46 @@
+import { Box, HStack, Text, useToast, VStack } from '@chakra-ui/react';
+import SaveTrailModal from './SaveTrailModal.jsx';
 
-function MapInfo({ routeInfo }) {
+function MapInfo({ routeInfo, currentRoute }) {
+  const toast = useToast();
+
+  const handleTrailSaved = (savedTrail) => {
+    toast({
+      title: "Trail saved successfully!",
+      description: `"${savedTrail.name}" has been saved to your trails.`,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
   return (
-    <div className="MapInfo">
+    <Box className="MapInfo" p={4} bg="white" shadow="md" borderRadius="md" m={4}>
       {routeInfo ? (
-        <h2>
-          Distance: {routeInfo.distanceKm} km&nbsp;|&nbsp;↗︎ {routeInfo.ascendM} m&nbsp;
-          ↘︎ {routeInfo.descendM} m&nbsp;|&nbsp;Duration: {routeInfo.durationMin} min
-        </h2>
+        <VStack spacing={4} align="stretch">
+          <Text fontSize="lg" fontWeight="bold">
+            Distance: {routeInfo.distanceKm} km • ↗︎ {routeInfo.ascendM} m • 
+            ↘︎ {routeInfo.descendM} m • Duration: {routeInfo.durationMin} min
+          </Text>
+          
+          <HStack justify="center">
+            <SaveTrailModal
+              route={currentRoute}
+              routeStats={{
+                lengthKm: parseFloat(routeInfo.distanceKm),
+                heightKm: routeInfo.ascendM / 1000, // Convert to km
+                durationMinutes: routeInfo.durationMin
+              }}
+              onTrailSaved={handleTrailSaved}
+            />
+          </HStack>
+        </VStack>
       ) : (
-        <h2>Select a route to see details.</h2>
+        <Text fontSize="lg" textAlign="center" color="gray.500">
+          Click on the map to start creating a route
+        </Text>
       )}
-    </div>
+    </Box>
   );
 }
 

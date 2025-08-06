@@ -42,7 +42,7 @@ function FlyToUser({ pos }) {
 }
 /* ──────────────────── component ──────────────────── */
 
-const InicialMap = ({ onRouteInfo }) => {
+const InicialMap = ({ onRouteInfo, onRouteCreated }) => {
   const { pos, error } = useGeolocation();
 
   /* ----- route callback ----- */
@@ -55,9 +55,13 @@ const InicialMap = ({ onRouteInfo }) => {
         `Distance: ${distanceKm} km  |  ↗︎ ${ascendM} m  ↘︎ ${descendM} m  |  Duration: ${durationMin} min`
       );
 
+      // Pass route info to parent
       onRouteInfo?.({ distanceKm, ascendM, descendM, durationMin });
+      
+      // Pass full route data for saving
+      onRouteCreated?.(geojson);
     },
-    [onRouteInfo]
+    [onRouteInfo, onRouteCreated]
   );
 
   /* ----- map ui ----- */
