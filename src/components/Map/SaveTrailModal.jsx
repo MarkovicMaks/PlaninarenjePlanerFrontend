@@ -1,3 +1,4 @@
+// src/components/Map/SaveTrailModal.jsx
 import React, { useState } from 'react';
 import {
   Box,
@@ -6,7 +7,6 @@ import {
   VStack,
   Text,
   Textarea,
-  Select,
   Field,
   DialogRoot,
   DialogTrigger,
@@ -25,7 +25,8 @@ export default function SaveTrailModal({
   route, 
   routeStats, 
   isDisabled = false,
-  onTrailSaved 
+  onTrailSaved,
+  onClearAfterSave
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -81,6 +82,9 @@ export default function SaveTrailModal({
       // Notify parent component
       onTrailSaved?.(savedTrail);
       
+      // Clear the map and reset waypoints
+      onClearAfterSave?.();
+      
     } catch (error) {
       console.error('Error saving trail:', error);
       
@@ -113,7 +117,7 @@ export default function SaveTrailModal({
   }
 
   return (
-    <DialogRoot open={isOpen} onOpenChange={setIsOpen}>
+    <DialogRoot open={isOpen} onOpenChange={(details) => setIsOpen(details.open)}>
       <DialogTrigger asChild>
         <Button
           leftIcon={<Save size={16} />}
@@ -165,16 +169,21 @@ export default function SaveTrailModal({
 
             <Field.Root>
               <Field.Label>Difficulty</Field.Label>
-              <Select.Root value={difficulty} onValueChange={setDifficulty}>
-                <Select.Trigger>
-                  <Select.ValueText />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value="EASY">Easy</Select.Item>
-                  <Select.Item value="MEDIUM">Medium</Select.Item>
-                  <Select.Item value="HARD">Hard</Select.Item>
-                </Select.Content>
-              </Select.Root>
+              <select 
+                value={difficulty} 
+                onChange={(e) => setDifficulty(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: '1px solid #e2e8f0'
+                }}
+                disabled={loading}
+              >
+                <option value="EASY">Easy</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HARD">Hard</option>
+              </select>
             </Field.Root>
 
             {error && (

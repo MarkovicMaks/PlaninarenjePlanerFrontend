@@ -1,17 +1,13 @@
-import { Box, HStack, Text, useToast, VStack } from '@chakra-ui/react';
+import { Box, HStack, Text, VStack } from '@chakra-ui/react';
 import SaveTrailModal from './SaveTrailModal.jsx';
 
-function MapInfo({ routeInfo, currentRoute }) {
-  const toast = useToast();
-
+function MapInfo({ routeInfo, currentRoute, onClearAfterSave }) {
   const handleTrailSaved = (savedTrail) => {
-    toast({
-      title: "Trail saved successfully!",
-      description: `"${savedTrail.name}" has been saved to your trails.`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+    // Simple alert as fallback
+    alert(`Trail "${savedTrail.name}" saved successfully!`);
+    
+    // Clear the map after saving
+    onClearAfterSave?.();
   };
 
   return (

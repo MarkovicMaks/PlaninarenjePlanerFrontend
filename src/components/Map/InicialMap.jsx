@@ -3,6 +3,15 @@ import { useState, useEffect, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import RoutingMachine from "./RoutingMachine.jsx";
 import "leaflet/dist/leaflet.css";
+import L from 'leaflet';
+
+// Fix for default markers
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 /* ──────────────────── geolocation hook ──────────────────── */
 function useGeolocation() {
@@ -40,9 +49,9 @@ function FlyToUser({ pos }) {
   }, [pos, map]);
   return null;
 }
-/* ──────────────────── component ──────────────────── */
 
-const InicialMap = ({ onRouteInfo, onRouteCreated }) => {
+/* ──────────────────── component ──────────────────── */
+const InicialMap = ({ onRouteInfo, onRouteCreated, onWaypointsChange, shouldCreateRoute, shouldClearWaypoints }) => {
   const { pos, error } = useGeolocation();
 
   /* ----- route callback ----- */
@@ -70,7 +79,7 @@ const InicialMap = ({ onRouteInfo, onRouteCreated }) => {
   const mapZoom = pos ? 14 : 15;
 
   return (
-    <div style={{ height: "80%", width: "80vw" }}>
+    <div style={{ height: "100%", width: "100%" }}>
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <MapContainer
@@ -87,12 +96,14 @@ const InicialMap = ({ onRouteInfo, onRouteCreated }) => {
             <Popup>Vi ste ovdje</Popup>
           </Marker>
         )}
-        {/* fly once permission granted */}
         <FlyToUser pos={pos} />
 
         <RoutingMachine
           apiKey="15cd8335-e008-4c2b-a710-2b01581ac01e"
           onRouteFound={handleRouteResult}
+          onWaypointsChange={onWaypointsChange}
+          shouldCreateRoute={shouldCreateRoute}
+          shouldClearWaypoints={shouldClearWaypoints}
         />
       </MapContainer>
     </div>

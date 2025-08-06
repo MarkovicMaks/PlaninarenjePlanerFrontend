@@ -1,54 +1,108 @@
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet-routing-machine';                      // adds L.Routing
-import 'lrm-graphhopper';                              // adds L.Routing.graphHopper
-
+import 'leaflet-routing-machine';
+import 'lrm-graphhopper';
 import React from 'react';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
-
-function RoutingMachine({ apiKey, onRouteFound }) {
+function RoutingMachine({ apiKey, onRouteFound, shouldCreateRoute = false, onWaypointsChange, shouldClearWaypoints = false }) {
   const map = useMap();
+  const [routingControl, setRoutingControl] = React.useState(null);
+  const [waypoints, setWaypoints] = React.useState([]);
 
   React.useEffect(() => {
     if (!map) return;
 
-    const routingControl = L.Routing.control({
-      waypoints: [],  // start with no waypoints
-      router: L.Routing.graphHopper(apiKey, {  // use GraphHopper routing backend
-        urlParameters: { vehicle: 'foot' }     // specify foot (hiking) profile:contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
+    // Create routing control but don't auto-route
+    const control = L.Routing.control({
+      waypoints: [],
+      router: L.Routing.graphHopper(apiKey, {
+        urlParameters: { vehicle: 'foot' }
       }),
-      autoRoute: true,
+      autoRoute: false, // Disable auto routing
       routeWhileDragging: false,
-      addWaypoints: false,       // disable dragging to add new waypoints by line
-      show: false                // do not show the itinerary panel
+      addWaypoints: false,
+      show: false
     }).addTo(map);
 
-    // On each click, add a new waypoint and recompute route
-    map.on('click', (e) => {
-      const waypoints = routingControl.getWaypoints().map(wp => wp.latLng).filter(Boolean);
-      waypoints.push(e.latlng);
-      routingControl.setWaypoints(waypoints);
-    });
+    setRoutingControl(control);
 
-    // Listen for route results to retrieve GeoJSON and distance
-    routingControl.on('routesfound', function(e) {
+    // Handle map clicks to add waypoints
+    const handleMapClick = (e) => {
+      setWaypoints(prev => {
+        const newWaypoints = [...prev, e.latlng];
+        
+        // Update routing control waypoints but don't route yet
+        control.setWaypoints(newWaypoints);
+        
+        // Notify parent of waypoint changes
+        onWaypointsChange?.(newWaypoints);
+        
+        return newWaypoints;
+      });
+    };
+
+    map.on('click', handleMapClick);
+
+    // Listen for route results when routing is triggered
+    control.on('routesfound', function(e) {
       const route = e.routes[0];
-      const { totalDistance, totalTime } = route.summary;  // in meters and seconds:contentReference[oaicite:2]{index=2}:contentReference[oaicite:3]{index=3}
+      if (!route) return;
+
+      const { totalDistance, totalTime } = route.summary;
       const geojson = {
         type: 'Feature',
         geometry: {
           type: 'LineString',
-          coordinates: route.coordinates.map(coord => [coord.lng, coord.lat])  // convert to [lng, lat]
+          coordinates: route.coordinates.map(coord => [coord.lng, coord.lat])
         },
         properties: { totalDistance, totalTime }
       };
-      onRouteFound?.(geojson, totalDistance);
+
+      // Calculate elevation if available
+      let ascendM = 0;
+      let descendM = 0;
+      
+      if (route.instructions) {
+        route.instructions.forEach(instruction => {
+          if (instruction.ascend) ascendM += instruction.ascend;
+          if (instruction.descend) descendM += instruction.descend;
+        });
+      }
+
+      onRouteFound?.(geojson, totalDistance, ascendM, descendM);
     });
 
-    return () => map.removeControl(routingControl);
-  }, [map, apiKey, onRouteFound]);
+    return () => {
+      map.off('click', handleMapClick);
+      map.removeControl(control);
+    };
+  }, [map, apiKey]);
+
+  // Trigger routing when shouldCreateRoute changes to true
+  React.useEffect(() => {
+    if (shouldCreateRoute && routingControl && waypoints.length >= 2) {
+      console.log('Creating route with waypoints:', waypoints);
+      routingControl.route(); // Manually trigger routing
+    }
+  }, [shouldCreateRoute, routingControl, waypoints]);
+
+  // Clear waypoints when shouldClearWaypoints changes to true
+  React.useEffect(() => {
+    if (shouldClearWaypoints && routingControl) {
+      console.log('Clearing waypoints');
+      
+      // Clear waypoints from routing control
+      routingControl.setWaypoints([]);
+      
+      // Clear local state
+      setWaypoints([]);
+      
+      // Notify parent
+      onWaypointsChange?.([]);
+    }
+  }, [shouldClearWaypoints, routingControl, onWaypointsChange]);
 
   return null;
 }
