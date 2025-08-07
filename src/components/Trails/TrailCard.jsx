@@ -1,6 +1,6 @@
 // src/components/Trails/TrailCard.jsx
 import { Box, Text, VStack, HStack, Badge } from '@chakra-ui/react';
-import { MapPin, Clock, TrendingUp } from 'lucide-react';
+import { MapPin, Clock, TrendingUp, TrendingDown, Mountain } from 'lucide-react';
 
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
@@ -19,6 +19,8 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
       year: 'numeric'
     });
   };
+
+  const hasElevationData = trail.minElevation !== null && trail.maxElevation !== null;
 
   return (
     <Box
@@ -39,7 +41,7 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
       <VStack align="stretch" spacing={3}>
         {/* Trail Name and Difficulty */}
         <HStack justify="space-between" align="start">
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
+          <Text fontSize="lg" fontWeight="bold" color="gray.800" noOfLines={1}>
             {trail.name}
           </Text>
           <Badge colorScheme={getDifficultyColor(trail.difficulty)} size="sm">
@@ -47,7 +49,7 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
           </Badge>
         </HStack>
 
-        {/* Trail Stats */}
+        {/* Basic Trail Stats */}
         <HStack spacing={4} fontSize="sm" color="gray.600">
           <HStack spacing={1}>
             <MapPin size={16} />
@@ -55,15 +57,52 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
           </HStack>
           
           <HStack spacing={1}>
-            <TrendingUp size={16} />
-            <Text>↗ {Math.round(trail.heightKm * 1000)}m</Text>
-          </HStack>
-          
-          <HStack spacing={1}>
             <Clock size={16} />
             <Text>{trail.waypoints?.length || 0} points</Text>
           </HStack>
         </HStack>
+
+        {/* Elevation Stats */}
+        {hasElevationData && (
+          <>
+            
+            <VStack align="stretch" spacing={2}>
+              <HStack justify="space-between" fontSize="xs" color="blue.700">
+                <Text fontWeight="medium">📊 Elevation Profile</Text>
+                <Box w={2} h={2} bg="green.400" borderRadius="full" />
+              </HStack>
+              
+              <HStack spacing={4} fontSize="sm" color="gray.600">
+                <HStack spacing={1}>
+                  <Mountain size={14} />
+                  <Text>{Math.round(trail.minElevation)}m - {Math.round(trail.maxElevation)}m</Text>
+                </HStack>
+              </HStack>
+              
+              <HStack spacing={4} fontSize="sm" color="gray.600">
+                <HStack spacing={1} color="green.600">
+                  <TrendingUp size={14} />
+                  <Text>↗ {Math.round(trail.totalAscent)}m</Text>
+                </HStack>
+                
+                <HStack spacing={1} color="red.500">
+                  <TrendingDown size={14} />
+                  <Text>↘ {Math.round(trail.totalDescent)}m</Text>
+                </HStack>
+              </HStack>
+            </VStack>
+          </>
+        )}
+
+        {/* Old Height Display (fallback) */}
+        {!hasElevationData && (
+          <HStack spacing={4} fontSize="sm" color="gray.600">
+            <HStack spacing={1}>
+              <TrendingUp size={16} />
+              <Text>↗ {Math.round(trail.heightKm * 1000)}m</Text>
+            </HStack>
+          </HStack>
+        )}
 
         {/* Description */}
         {trail.description && (

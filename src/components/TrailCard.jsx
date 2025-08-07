@@ -1,6 +1,6 @@
 // src/components/TrailCard.jsx
 import {
-  Card,            // namespace     → Card.Root, Card.Header, …
+  Card,            
   Heading,
   Text,
   Badge,

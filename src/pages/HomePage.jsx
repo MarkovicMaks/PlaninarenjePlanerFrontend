@@ -1,10 +1,10 @@
-// src/pages/Home.jsx
+// src/pages/HomePage.jsx
 import Filterbar from "../components/Filters/Filterbar";
 import InicialMap from "../components/Map/InicialMap";
 import Navbar from "../components/Navbar";
 import MapInfo from "../components/Map/MapInfo";
 import MapControls from "../components/Map/MapControls";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Box } from "@chakra-ui/react";
 
 export default function HomePage() {
@@ -15,47 +15,57 @@ export default function HomePage() {
   const [shouldClearWaypoints, setShouldClearWaypoints] = useState(false);
   const [isCreatingRoute, setIsCreatingRoute] = useState(false);
 
-  const handleRouteCreated = (route) => {
+  const handleRouteCreated = useCallback((route) => {
     console.log('Route created:', route);
     setCurrentRoute(route);
     setIsCreatingRoute(false);
-    setShouldCreateRoute(false); // Reset trigger
-  };
+  }, []);
 
-  const handleWaypointsChange = (newWaypoints) => {
+  const handleWaypointsChange = useCallback((newWaypoints) => {
     setWaypoints(newWaypoints);
     // Clear previous route when waypoints change
     if (currentRoute) {
       setCurrentRoute(null);
       setRouteInfo(null);
     }
-  };
+  }, [currentRoute]);
 
-  const handleCreateRoute = () => {
+  const handleCreateRoute = useCallback(() => {
     if (waypoints.length >= 2) {
       setIsCreatingRoute(true);
-      setShouldCreateRoute(true); // Trigger route creation
+      setShouldCreateRoute(true);
     }
-  };
+  }, [waypoints.length]);
 
-  const handleClearWaypoints = () => {
+  const handleClearWaypoints = useCallback(() => {
     setShouldClearWaypoints(true);
     
     // Reset all state
     setWaypoints([]);
     setCurrentRoute(null);
     setRouteInfo(null);
-    
-    // Reset clear trigger after a short delay
-    setTimeout(() => {
-      setShouldClearWaypoints(false);
-    }, 100);
-  };
+    setIsCreatingRoute(false);
+  }, []);
 
-  const handleTrailSaved = () => {
+  const handleTrailSaved = useCallback(() => {
     // Clear everything after saving
     handleClearWaypoints();
-  };
+  }, [handleClearWaypoints]);
+
+  // Reset flags after they've been processed
+  useEffect(() => {
+    if (shouldCreateRoute) {
+      const timer = setTimeout(() => setShouldCreateRoute(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldCreateRoute]);
+
+  useEffect(() => {
+    if (shouldClearWaypoints) {
+      const timer = setTimeout(() => setShouldClearWaypoints(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldClearWaypoints]);
 
   return (
     <div className="HomeLayout">

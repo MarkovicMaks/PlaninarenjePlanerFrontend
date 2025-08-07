@@ -78,6 +78,12 @@ const InicialMap = ({ onRouteInfo, onRouteCreated, onWaypointsChange, shouldCrea
   const mapCenter = pos ? [pos.lat, pos.lng] : fallbackCenter;
   const mapZoom = pos ? 14 : 15;
 
+  console.log('InicialMap render with props:', { 
+    shouldCreateRoute, 
+    shouldClearWaypoints,
+    onWaypointsChange: !!onWaypointsChange 
+  });
+
   return (
     <div style={{ height: "100%", width: "100%" }}>
       {error && <p style={{ color: "red" }}>{error}</p>}
@@ -86,18 +92,24 @@ const InicialMap = ({ onRouteInfo, onRouteCreated, onWaypointsChange, shouldCrea
         center={mapCenter}
         zoom={mapZoom}
         style={{ height: "100%", width: "100%" }}
+        // VAŽNO: Dodaj event handler props da nema konflikata
+        whenReady={() => console.log('Map is ready')}
       >
         <TileLayer
           attribution="© OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        
+        {/* User location marker */}
         {pos && (
           <Marker position={[pos.lat, pos.lng]}>
             <Popup>Vi ste ovdje</Popup>
           </Marker>
         )}
+        
         <FlyToUser pos={pos} />
 
+        {/* Routing machine - main component for waypoints and routing */}
         <RoutingMachine
           apiKey="15cd8335-e008-4c2b-a710-2b01581ac01e"
           onRouteFound={handleRouteResult}

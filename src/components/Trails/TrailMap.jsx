@@ -62,8 +62,13 @@ export default function TrailMap({ trail }) {
   const centerLat = positions.reduce((sum, pos) => sum + pos[0], 0) / positions.length;
   const centerLng = positions.reduce((sum, pos) => sum + pos[1], 0) / positions.length;
 
+  // Check if we have elevation data
+  const hasElevationData = trail.minElevation !== null && trail.maxElevation !== null;
+  const startWaypoint = sortedWaypoints[0];
+  const endWaypoint = sortedWaypoints[sortedWaypoints.length - 1];
+
   return (
-    <div style={{ height: '100%', width: '100%' }}>
+    <div style={{ height: '80%', width: '50vw' }}>
       <MapContainer
         center={[centerLat, centerLng]}
         zoom={13}
@@ -85,45 +90,67 @@ export default function TrailMap({ trail }) {
           opacity={0.7}
         />
         
-        {/* Start marker */}
+        {/* Start marker (first waypoint) */}
         {positions.length > 0 && (
           <Marker position={positions[0]} icon={startIcon}>
             <Popup>
-              <div>
-                <strong>Start</strong><br/>
-                {trail.name}
+              <div style={{ minWidth: '200px' }}>
+                <strong>🚀 Start Point</strong><br/>
+                <div style={{ margin: '8px 0' }}>
+                  <strong>{trail.name}</strong><br/>
+                  <small>Waypoint 1</small>
+                </div>
+                
+                {startWaypoint.elevation && (
+                  <div style={{ marginTop: '8px', padding: '4px', backgroundColor: '#f0f8ff', borderRadius: '4px' }}>
+                    <small>📊 <strong>Elevation:</strong> {Math.round(startWaypoint.elevation)}m</small>
+                  </div>
+                )}
+                
+                {hasElevationData && (
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                    <div><strong>Trail Stats:</strong></div>
+                    <div>📍 Length: {trail.lengthKm} km</div>
+                    <div>⛰️ Range: {Math.round(trail.minElevation)}m - {Math.round(trail.maxElevation)}m</div>
+                    <div>📈 Ascent: {Math.round(trail.totalAscent)}m</div>
+                    <div>📉 Descent: {Math.round(trail.totalDescent)}m</div>
+                  </div>
+                )}
               </div>
             </Popup>
           </Marker>
         )}
         
-        {/* End marker (if different from start) */}
+        {/* End marker (last waypoint, only if different from start) */}
         {positions.length > 1 && (
           <Marker position={positions[positions.length - 1]} icon={endIcon}>
             <Popup>
-              <div>
-                <strong>End</strong><br/>
-                {trail.name}
+              <div style={{ minWidth: '180px' }}>
+                <strong>🏁 End Point</strong><br/>
+                <div style={{ margin: '8px 0' }}>
+                  <strong>{trail.name}</strong><br/>
+                  <small>Waypoint {endWaypoint.order}</small>
+                </div>
+                
+                {endWaypoint.elevation && (
+                  <div style={{ marginTop: '8px', padding: '4px', backgroundColor: '#fff0f0', borderRadius: '4px' }}>
+                    <small>📊 <strong>Elevation:</strong> {Math.round(endWaypoint.elevation)}m</small>
+                  </div>
+                )}
+                
+                {startWaypoint.elevation && endWaypoint.elevation && (
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                    <strong>Elevation Change:</strong><br/>
+                    {endWaypoint.elevation > startWaypoint.elevation ? 
+                      <span style={{color: 'green'}}>↗ +{Math.round(endWaypoint.elevation - startWaypoint.elevation)}m</span> :
+                      <span style={{color: 'red'}}>↘ {Math.round(endWaypoint.elevation - startWaypoint.elevation)}m</span>
+                    }
+                  </div>
+                )}
               </div>
             </Popup>
           </Marker>
         )}
-        
-        {/* Intermediate waypoints */}
-        {sortedWaypoints.slice(1, -1).map((waypoint, index) => (
-          <Marker 
-            key={`waypoint-${waypoint.order}`} 
-            position={[waypoint.latitude, waypoint.longitude]}
-          >
-            <Popup>
-              <div>
-                <strong>Waypoint {waypoint.order}</strong><br/>
-                Lat: {waypoint.latitude.toFixed(6)}<br/>
-                Lng: {waypoint.longitude.toFixed(6)}
-              </div>
-            </Popup>
-          </Marker>
-        ))}
       </MapContainer>
     </div>
   );

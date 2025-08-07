@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SignupPage from "./pages/SignupPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import TrailListPage from "./pages/TrailListPage.jsx";
 
 
 export default function App() {

@@ -26,7 +26,7 @@ export default function SaveTrailModal({
   routeStats, 
   isDisabled = false,
   onTrailSaved,
-  onClearAfterSave
+  onClearAfterSave // Vraćen nazad
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
