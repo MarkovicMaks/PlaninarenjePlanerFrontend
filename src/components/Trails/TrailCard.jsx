@@ -1,6 +1,8 @@
 // src/components/Trails/TrailCard.jsx
 import { Box, Text, VStack, HStack, Badge } from '@chakra-ui/react';
 import { MapPin, Clock, TrendingUp, TrendingDown, Mountain } from 'lucide-react';
+import BiomeDisplay from './BiomeDisplay';
+import ElevationGraph from './ElevationGraph';
 
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
@@ -62,36 +64,25 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
           </HStack>
         </HStack>
 
-        {/* Elevation Stats */}
+        {/* Elevation Graph */}
         {hasElevationData && (
-          <>
-            
-            <VStack align="stretch" spacing={2}>
-              <HStack justify="space-between" fontSize="xs" color="blue.700">
-                <Text fontWeight="medium">📊 Elevation Profile</Text>
-                <Box w={2} h={2} bg="green.400" borderRadius="full" />
+          <ElevationGraph 
+            waypoints={trail.waypoints}
+            totalAscent={trail.totalAscent}
+            totalDescent={trail.totalDescent}
+          />
+        )}
+
+        {/* Elevation Stats (keep for trails without graph) */}
+        {hasElevationData && (
+          <VStack align="stretch" spacing={2}>
+            <HStack spacing={4} fontSize="sm" color="gray.600">
+              <HStack spacing={1}>
+                <Mountain size={14} />
+                <Text>{Math.round(trail.minElevation)}m - {Math.round(trail.maxElevation)}m</Text>
               </HStack>
-              
-              <HStack spacing={4} fontSize="sm" color="gray.600">
-                <HStack spacing={1}>
-                  <Mountain size={14} />
-                  <Text>{Math.round(trail.minElevation)}m - {Math.round(trail.maxElevation)}m</Text>
-                </HStack>
-              </HStack>
-              
-              <HStack spacing={4} fontSize="sm" color="gray.600">
-                <HStack spacing={1} color="green.600">
-                  <TrendingUp size={14} />
-                  <Text>↗ {Math.round(trail.totalAscent)}m</Text>
-                </HStack>
-                
-                <HStack spacing={1} color="red.500">
-                  <TrendingDown size={14} />
-                  <Text>↘ {Math.round(trail.totalDescent)}m</Text>
-                </HStack>
-              </HStack>
-            </VStack>
-          </>
+            </HStack>
+          </VStack>
         )}
 
         {/* Old Height Display (fallback) */}
@@ -103,6 +94,9 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
             </HStack>
           </HStack>
         )}
+
+        {/* Biome Analysis Component */}
+        <BiomeDisplay biomes={trail.biomes} />
 
         {/* Description */}
         {trail.description && (

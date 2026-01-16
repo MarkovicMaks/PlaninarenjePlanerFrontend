@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SimpleGrid, Heading, Text } from "@chakra-ui/react";
-import TrailCard from "./TrailCard";
+
 
 // 🚧  placeholder rute
 const demoTrails = [
@@ -38,11 +38,6 @@ export default function UserTrails({ userId }) {
         Moje rute ({trails.length})
       </Heading>
 
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-        {trails.map((t) => (
-          <TrailCard key={t.id} trail={t} />
-        ))}
-      </SimpleGrid>
     </>
   );
 }
