@@ -1,8 +1,12 @@
 // src/components/Trails/TrailCard.jsx
+import { useState } from 'react';
 import { Box, Text, VStack, HStack, Badge } from '@chakra-ui/react';
 import { MapPin, Clock, TrendingUp, TrendingDown, Mountain } from 'lucide-react';
 import BiomeDisplay from './BiomeDisplay';
 import ElevationGraph from './ElevationGraph';
+import InteractiveStarRating from './InteractiveStarRating';
+import { trailService } from '../../services/trailService';
+import { useAuth } from '../../contexts/AuthContext';
 
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
@@ -13,7 +17,11 @@ const getDifficultyColor = (difficulty) => {
   }
 };
 
-export default function TrailCard({ trail, onClick, isSelected = false }) {
+export default function TrailCard({ trail, onClick, isSelected = false, onRatingChange }) {
+  const { isAuthenticated } = useAuth();
+  const [ratingStats, setRatingStats] = useState(trail.ratingStats);
+  const [isRating, setIsRating] = useState(false);
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-GB', {
       day: '2-digit',
@@ -24,6 +32,35 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
 
   const hasElevationData = trail.minElevation !== null && trail.maxElevation !== null;
 
+  const handleRate = async (rating) => {
+    if (isRating) return; // Prevent double-clicking
+    
+    setIsRating(true);
+    try {
+      const newStats = await trailService.rateTrail(trail.id, rating);
+      setRatingStats(newStats);
+      
+      // Notify parent component if needed
+      onRatingChange?.(trail.id, newStats);
+      
+      console.log(`Rated trail ${trail.id} with ${rating} stars`);
+    } catch (error) {
+      console.error('Failed to rate trail:', error);
+      alert('Failed to submit rating. Please try again.');
+    } finally {
+      setIsRating(false);
+    }
+  };
+
+  const handleCardClick = (e) => {
+    // Don't trigger card click if clicking on stars
+    if (e.target.closest('.star-rating-container')) {
+      e.stopPropagation();
+      return;
+    }
+    onClick?.();
+  };
+
   return (
     <Box
       p={4}
@@ -33,7 +70,7 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
       borderRadius="md"
       shadow={isSelected ? 'lg' : 'sm'}
       cursor="pointer"
-      onClick={onClick}
+      onClick={handleCardClick}
       _hover={{
         shadow: 'md',
         bg: isSelected ? 'blue.100' : 'gray.50'
@@ -43,9 +80,27 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
       <VStack align="stretch" spacing={3}>
         {/* Trail Name and Difficulty */}
         <HStack justify="space-between" align="start">
-          <Text fontSize="lg" fontWeight="bold" color="gray.800" noOfLines={1}>
-            {trail.name}
-          </Text>
+          <VStack align="start" spacing={1} flex={1}>
+            <Text fontSize="lg" fontWeight="bold" color="gray.800" noOfLines={1}>
+              {trail.name}
+            </Text>
+            
+            {/* Interactive Rating */}
+            <Box 
+              className="star-rating-container"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <InteractiveStarRating 
+                rating={ratingStats?.averageRating}
+                totalRatings={ratingStats?.totalRatings || 0}
+                userRating={ratingStats?.userRating}
+                onRate={handleRate}
+                isAuthenticated={isAuthenticated}
+                size="sm"
+              />
+            </Box>
+          </VStack>
+          
           <Badge colorScheme={getDifficultyColor(trail.difficulty)} size="sm">
             {trail.difficulty}
           </Badge>
@@ -73,7 +128,7 @@ export default function TrailCard({ trail, onClick, isSelected = false }) {
           />
         )}
 
-        {/* Elevation Stats (keep for trails without graph) */}
+        {/* Elevation Stats */}
         {hasElevationData && (
           <VStack align="stretch" spacing={2}>
             <HStack spacing={4} fontSize="sm" color="gray.600">

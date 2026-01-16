@@ -177,6 +177,38 @@ class TrailService {
     }
   }
 
+  async rateTrail(trailId, rating) {
+  try {
+    const response = await this.api.post(`/trails/${trailId}/rating`, { rating });
+    return response.data;
+  } catch (error) {
+    console.error('Error rating trail:', error);
+    throw error;
+  }
+}
+
+// Delete your rating for a trail
+async deleteRating(trailId) {
+  try {
+    await this.api.delete(`/trails/${trailId}/rating`);
+    return true;
+  } catch (error) {
+    console.error('Error deleting rating:', error);
+    throw error;
+  }
+}
+
+// Get rating stats for a trail
+async getRatingStats(trailId) {
+  try {
+    const response = await this.api.get(`/trails/${trailId}/rating`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting rating stats:', error);
+    throw error;
+  }
+}
+
   // Konvertiraj waypoints natrag u GeoJSON za prikaz na karti
   waypointsToGeoJSON(waypoints) {
     if (!waypoints || !Array.isArray(waypoints)) {
