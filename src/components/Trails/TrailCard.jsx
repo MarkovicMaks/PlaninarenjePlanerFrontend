@@ -117,38 +117,23 @@ export default function TrailCard({ trail, onClick, isSelected = false, onRating
             <Clock size={16} />
             <Text>{trail.waypoints?.length || 0} points</Text>
           </HStack>
-        </HStack>
-
-        {/* Elevation Graph */}
-        {hasElevationData && (
-          <ElevationGraph 
-            waypoints={trail.waypoints}
-            totalAscent={trail.totalAscent}
-            totalDescent={trail.totalDescent}
-          />
-        )}
-
-        {/* Elevation Stats */}
-        {hasElevationData && (
-          <VStack align="stretch" spacing={2}>
-            <HStack spacing={4} fontSize="sm" color="gray.600">
-              <HStack spacing={1}>
-                <Mountain size={14} />
-                <Text>{Math.round(trail.minElevation)}m - {Math.round(trail.maxElevation)}m</Text>
-              </HStack>
+          
+          {/* Show elevation range in basic stats */}
+          {hasElevationData && (
+            <HStack spacing={1}>
+              <Mountain size={16} />
+              <Text>{Math.round(trail.minElevation)}m - {Math.round(trail.maxElevation)}m</Text>
             </HStack>
-          </VStack>
-        )}
-
-        {/* Old Height Display (fallback) */}
-        {!hasElevationData && (
-          <HStack spacing={4} fontSize="sm" color="gray.600">
+          )}
+          
+          {/* Show total ascent for non-elevation data trails */}
+          {!hasElevationData && (
             <HStack spacing={1}>
               <TrendingUp size={16} />
               <Text>↗ {Math.round(trail.heightKm * 1000)}m</Text>
             </HStack>
-          </HStack>
-        )}
+          )}
+        </HStack>
 
         {/* Biome Analysis Component */}
         <BiomeDisplay biomes={trail.biomes} />

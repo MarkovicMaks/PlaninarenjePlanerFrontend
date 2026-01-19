@@ -1,24 +1,23 @@
 // src/pages/TrailListPage.jsx
-import { useState, useEffect } from "react";
-import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Spinner,
+import { useState, useEffect } from 'react';
+import { 
+  Box, 
+  VStack, 
+  HStack, 
+  Text, 
+  Spinner, 
   Alert,
   AlertDescription,
-  Grid,
-  GridItem,
   Button,
-  Flex,
-} from "@chakra-ui/react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { trailService } from "../services/trailService.js";
-import { useAuth } from "../contexts/AuthContext.jsx";
-import Navbar from "../components/Navbar.jsx";
-import TrailCard from "../components/Trails/TrailCard.jsx";
-import TrailMap from "../components/Trails/TrailMap.jsx";
+  Flex
+} from '@chakra-ui/react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { trailService } from '../services/trailService.js';
+import { useAuth } from '../contexts/AuthContext.jsx';
+import Navbar from '../components/Navbar.jsx';
+import TrailCard from '../components/Trails/TrailCard.jsx';
+import TrailMap from '../components/Trails/TrailMap.jsx';
+import ElevationGraph from '../components/Trails/ElevationGraph.jsx';
 
 const TRAILS_PER_PAGE = 10;
 
@@ -39,28 +38,32 @@ export default function TrailListPage() {
       setLoading(true);
       setError(null);
       const trailsData = await trailService.getAllTrails();
-
+      
       // Sort by newest first (createdAt descending)
-      const sortedTrails = trailsData.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      const sortedTrails = trailsData.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
       );
-
+      
       setAllTrails(sortedTrails);
-
-      // Auto-select first trail if available
-      if (sortedTrails.length > 0) {
-        setSelectedTrail(sortedTrails[0]);
-      }
     } catch (error) {
-      console.error("Error loading trails:", error);
-      setError("Failed to load trails. Please try again.");
+      console.error('Error loading trails:', error);
+      setError('Failed to load trails. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleTrailSelect = (trail) => {
-    setSelectedTrail(trail);
+    // If clicking the same trail, close it
+    if (selectedTrail?.id === trail.id) {
+      setSelectedTrail(null);
+    } else {
+      setSelectedTrail(trail);
+    }
+  };
+
+  const handleCloseMap = () => {
+    setSelectedTrail(null);
   };
 
   // Calculate pagination
@@ -71,10 +74,7 @@ export default function TrailListPage() {
 
   const goToPage = (page) => {
     setCurrentPage(page);
-    // Reset selected trail when changing pages
-    if (currentTrails.length > 0) {
-      setSelectedTrail(currentTrails[0]);
-    }
+    setSelectedTrail(null); // Close map when changing pages
   };
 
   const goToPrevPage = () => {
@@ -105,7 +105,7 @@ export default function TrailListPage() {
   return (
     <>
       <Navbar />
-      <Box p={4}>
+      <Box p={4} w="100%" maxW="100vw">
         <VStack align="stretch" spacing={6}>
           {/* Header */}
           <Box>
@@ -113,13 +113,9 @@ export default function TrailListPage() {
               Your Saved Trails
             </Text>
             <Text color="gray.600">
-              {allTrails.length} trail{allTrails.length !== 1 ? "s" : ""} total
+              {allTrails.length} trail{allTrails.length !== 1 ? 's' : ''} total
               {allTrails.length > TRAILS_PER_PAGE && (
-                <span>
-                  {" "}
-                  • Showing {startIndex + 1}-
-                  {Math.min(endIndex, allTrails.length)}
-                </span>
+                <span> • Showing {startIndex + 1}-{Math.min(endIndex, allTrails.length)}</span>
               )}
             </Text>
           </Box>
@@ -148,184 +144,145 @@ export default function TrailListPage() {
           )}
 
           {!loading && !error && allTrails.length > 0 && (
-            <Grid
-              templateColumns={{ base: "1fr", lg: "400px 1fr" }}
-              gap={6}
-              height="70vh"
-            >
-              {/* Trail List with Pagination */}
-              <GridItem>
-                <VStack align="stretch" spacing={4} height="100%">
-                  {/* Trails for current page */}
-                  <VStack
-                    align="stretch"
-                    spacing={3}
-                    flex="1"
-                    overflowY="auto"
-                    pr={2}
-                    maxHeight="calc(100% - 80px)"
-                  >
-                    {currentTrails.map((trail) => (
-                      <TrailCard
-                        key={trail.id}
-                        trail={trail}
-                        onClick={() => handleTrailSelect(trail)}
-                        isSelected={selectedTrail?.id === trail.id}
-                      />
-                    ))}
-                  </VStack>
-
-                  {/* Pagination Controls */}
-                  {totalPages > 1 && (
-                    <Box
-                      borderTop="1px solid"
-                      borderColor="gray.200"
-                      pt={4}
-                      mt={4}
-                    >
-                      <Flex justify="space-between" align="center">
-                        <Button
-                          size="sm"
-                          leftIcon={<ChevronLeft size={16} />}
-                          onClick={goToPrevPage}
-                          isDisabled={currentPage === 1}
-                          variant="outline"
-                        >
-                          Previous
-                        </Button>
-
-                        <HStack spacing={2}>
-                          {/* Page numbers */}
-                          {Array.from(
-                            { length: totalPages },
-                            (_, i) => i + 1
-                          ).map((page) => {
-                            // Show current page, first, last, and pages around current
-                            const shouldShow =
-                              page === 1 ||
-                              page === totalPages ||
-                              Math.abs(page - currentPage) <= 1;
-
-                            if (!shouldShow) {
-                              // Show ellipsis for gaps
-                              if (
-                                page === currentPage - 2 ||
-                                page === currentPage + 2
-                              ) {
-                                return (
-                                  <Text key={page} fontSize="sm">
-                                    ...
-                                  </Text>
-                                );
-                              }
-                              return null;
-                            }
-
-                            return (
-                              <Button
-                                key={page}
-                                size="sm"
-                                variant={
-                                  currentPage === page ? "solid" : "ghost"
-                                }
-                                colorScheme={
-                                  currentPage === page ? "blue" : "gray"
-                                }
-                                onClick={() => goToPage(page)}
-                                minW="8"
-                              >
-                                {page}
-                              </Button>
-                            );
-                          })}
+            <>
+              {/* Trail Cards - Full Width */}
+              <VStack align="stretch" spacing={3}>
+                {currentTrails.map((trail) => (
+                  <Box key={trail.id}>
+                    <TrailCard
+                      trail={trail}
+                      onClick={() => handleTrailSelect(trail)}
+                      isSelected={selectedTrail?.id === trail.id}
+                    />
+                    
+                    {/* Expandable Map Below Card */}
+                    {selectedTrail?.id === trail.id && (
+                      <Box 
+                        mt={3} 
+                        p={4} 
+                        bg="white" 
+                        borderRadius="md" 
+                        border="2px solid"
+                        borderColor="blue.500"
+                        shadow="lg"
+                      >
+                        {/* Map Header */}
+                        <HStack justify="space-between" mb={3}>
+                          <VStack align="start" spacing={1}>
+                            <Text fontSize="lg" fontWeight="bold">
+                              {selectedTrail?.name}
+                            </Text>
+                            <HStack spacing={4} fontSize="sm" color="gray.600">
+                              <Text>📍 {selectedTrail?.lengthKm} km</Text>
+                              <Text>📌 {selectedTrail?.waypoints?.length} waypoints</Text>
+                              {selectedTrail?.totalAscent && (
+                                <>
+                                  <Text>⛰️ ↗ {Math.round(selectedTrail.totalAscent)}m</Text>
+                                  <Text>⛰️ ↘ {Math.round(selectedTrail.totalDescent)}m</Text>
+                                </>
+                              )}
+                            </HStack>
+                          </VStack>
+                          
+                          <Button
+                            size="sm"
+                            leftIcon={<X size={16} />}
+                            onClick={handleCloseMap}
+                            variant="ghost"
+                          >
+                            Close Map
+                          </Button>
                         </HStack>
 
-                        <Button
-                          size="sm"
-                          rightIcon={<ChevronRight size={16} />}
-                          onClick={goToNextPage}
-                          isDisabled={currentPage === totalPages}
-                          variant="outline"
-                        >
-                          Next
-                        </Button>
-                      </Flex>
+                        {/* Elevation Graph - Import the component at the top */}
+                        {selectedTrail?.minElevation !== null && selectedTrail?.maxElevation !== null && (
+                          <Box mb={3}>
+                            <ElevationGraph 
+                              waypoints={selectedTrail.waypoints}
+                              totalAscent={selectedTrail.totalAscent}
+                              totalDescent={selectedTrail.totalDescent}
+                            />
+                          </Box>
+                        )}
 
-                      <Text
-                        fontSize="xs"
-                        color="gray.500"
-                        textAlign="center"
-                        mt={2}
-                      >
-                        Page {currentPage} of {totalPages}
-                      </Text>
-                    </Box>
-                  )}
-                </VStack>
-              </GridItem>
+                        {/* Map Container */}
+                        <Box height="500px" borderRadius="md" overflow="hidden">
+                          <TrailMap trail={selectedTrail} />
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                ))}
+              </VStack>
 
-              {/* Trail Map */}
-              <GridItem>
-                <Box
-                  height="100%"
-                  bg="gray.100"
-                  borderRadius="md"
-                  overflow="hidden"
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <Box 
+                  borderTop="1px solid"
+                  borderColor="gray.200"
+                  pt={4}
+                  mt={4}
                 >
-                  {selectedTrail ? (
-                    <>
-                      <Box
-                        p={4}
-                        bg="white"
-                        borderBottom="1px solid"
-                        borderColor="gray.200"
-                      >
-                        <VStack align="stretch" spacing={2}>
-                          <Text fontSize="xl" fontWeight="bold">
-                            {selectedTrail.name}
-                          </Text>
-                          <HStack spacing={6} fontSize="sm" color="gray.600">
-                            <Text>📍 {selectedTrail.lengthKm} km</Text>
-                            <Text>
-                              📌 {selectedTrail.waypoints?.length} waypoints
-                            </Text>
-                            {selectedTrail.totalAscent && (
-                              <>
-                                <Text>
-                                  ⛰️ ↗ {Math.round(selectedTrail.totalAscent)}m
-                                </Text>
-                                <Text>
-                                  ⛰️ ↘ {Math.round(selectedTrail.totalDescent)}m
-                                </Text>
-                              </>
-                            )}
-                          </HStack>
-                          {selectedTrail.description && (
-                            <Text fontSize="sm" color="gray.700">
-                              {selectedTrail.description}
-                            </Text>
-                          )}
-                        </VStack>
-                      </Box>
-                      <Box height="calc(100% - 120px)">
-                        <TrailMap trail={selectedTrail} />
-                      </Box>
-                    </>
-                  ) : (
-                    <Box
-                      height="100%"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
+                  <Flex justify="space-between" align="center">
+                    <Button
+                      size="sm"
+                      leftIcon={<ChevronLeft size={16} />}
+                      onClick={goToPrevPage}
+                      isDisabled={currentPage === 1}
+                      variant="outline"
                     >
-                      <Text color="gray.600">
-                        Select a trail to view on map
-                      </Text>
-                    </Box>
-                  )}
+                      Previous
+                    </Button>
+
+                    <HStack spacing={2}>
+                      {/* Page numbers */}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                        // Show current page, first, last, and pages around current
+                        const shouldShow = 
+                          page === 1 || 
+                          page === totalPages || 
+                          Math.abs(page - currentPage) <= 1;
+
+                        if (!shouldShow) {
+                          // Show ellipsis for gaps
+                          if (page === currentPage - 2 || page === currentPage + 2) {
+                            return <Text key={page} fontSize="sm">...</Text>;
+                          }
+                          return null;
+                        }
+
+                        return (
+                          <Button
+                            key={page}
+                            size="sm"
+                            variant={currentPage === page ? 'solid' : 'ghost'}
+                            colorScheme={currentPage === page ? 'blue' : 'gray'}
+                            onClick={() => goToPage(page)}
+                            minW="8"
+                          >
+                            {page}
+                          </Button>
+                        );
+                      })}
+                    </HStack>
+
+                    <Button
+                      size="sm"
+                      rightIcon={<ChevronRight size={16} />}
+                      onClick={goToNextPage}
+                      isDisabled={currentPage === totalPages}
+                      variant="outline"
+                    >
+                      Next
+                    </Button>
+                  </Flex>
+
+                  <Text fontSize="xs" color="gray.500" textAlign="center" mt={2}>
+                    Page {currentPage} of {totalPages}
+                  </Text>
                 </Box>
-              </GridItem>
-            </Grid>
+              )}
+            </>
           )}
         </VStack>
       </Box>
