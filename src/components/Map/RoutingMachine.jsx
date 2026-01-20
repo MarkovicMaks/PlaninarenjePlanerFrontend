@@ -10,44 +10,7 @@ function RoutingMachine({ apiKey, onRouteFound, shouldCreateRoute = false, onWay
   const map = useMap();
   const routingControlRef = React.useRef(null);
   const waypointsRef = React.useRef([]);
-
-  // Function to fetch 3D elevation data from GraphHopper
-  const fetchElevationData = React.useCallback(async (startPoint, endPoint) => {
-    try {
-      // SAMO 2 točke za elevation API - start i end
-      const url = `https://graphhopper.com/api/1/route?point=${startPoint.lat},${startPoint.lng}&point=${endPoint.lat},${endPoint.lng}&vehicle=foot&elevation=true&points_encoded=false&key=${apiKey}`;
-      
-      console.log('Fetching elevation data:', url);
-      
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.warn('Could not fetch elevation data:', response.status);
-        return null;
-      }
-      
-      const data = await response.json();
-      
-      if (data.paths && data.paths.length > 0) {
-        const path = data.paths[0];
-        console.log('Elevation data received:', {
-          coordinates: path.points.coordinates.length,
-          ascend: path.ascend,
-          descend: path.descend
-        });
-        
-        return {
-          coordinates: path.points.coordinates, // [lng, lat, elevation]
-          ascend: path.ascend || 0,
-          descend: path.descend || 0
-        };
-      }
-      
-      return null;
-    } catch (error) {
-      console.warn('Error fetching elevation data:', error);
-      return null;
-    }
-  }, [apiKey]);
+  const routeLineRef = React.useRef(null);
 
   React.useEffect(() => {
     if (!map) return;
@@ -58,10 +21,13 @@ function RoutingMachine({ apiKey, onRouteFound, shouldCreateRoute = false, onWay
       router: L.Routing.graphHopper(apiKey, {
         urlParameters: { vehicle: 'foot' }
       }),
-      autoRoute: false, // Disable auto routing
+      autoRoute: true,  // Changed to true - route automatically after each waypoint
       routeWhileDragging: false,
       addWaypoints: false,
-      show: false
+      show: false,
+      lineOptions: {
+        styles: [{ color: 'blue', opacity: 0.7, weight: 4 }]
+      }
     }).addTo(map);
 
     routingControlRef.current = control;
@@ -80,64 +46,79 @@ function RoutingMachine({ apiKey, onRouteFound, shouldCreateRoute = false, onWay
 
     map.on('click', handleMapClick);
 
-    // Listen for route results when routing is triggered
-    control.on('routesfound', async function(e) {
+    // Listen for route results
+    control.on('routesfound', function(e) {
       const route = e.routes[0];
       if (!route) return;
 
+      console.log('=== FULL ROUTE OBJECT ===');
+      console.log('Route:', route);
+      console.log('Route.coordinates:', route.coordinates);
+      console.log('Route.instructions:', route.instructions);
+
       const { totalDistance, totalTime } = route.summary;
       
-      // Get basic route coordinates from leaflet-routing-machine
-      const basicCoordinates = route.coordinates.map(coord => [coord.lng, coord.lat]);
+      // Extract ALL coordinates from the route
+      // The route line should already be drawn on the map by leaflet-routing-machine
+      // We need to get those coordinates
+      let allCoordinates = [];
       
-      // Try to fetch elevation data SAMO za start i end point
-      let elevationData = null;
-      if (waypointsRef.current.length >= 2) {
-        const startPoint = waypointsRef.current[0];
-        const endPoint = waypointsRef.current[waypointsRef.current.length - 1];
-        elevationData = await fetchElevationData(startPoint, endPoint);
+      // Try multiple sources for coordinates
+      if (route.coordinates && route.coordinates.length > 0) {
+        // Method 1: Direct coordinates (this is empty in your case)
+        allCoordinates = route.coordinates.map(c => [c.lng, c.lat]);
+        console.log('Got coordinates from route.coordinates:', allCoordinates.length);
+      } else if (route.instructions && route.instructions.length > 0) {
+        // Method 2: Extract from instructions
+        // Each instruction has an index pointing to coordinates
+        // We need to access the actual coordinate data
+        console.log('Extracting from instructions...');
+        
+        // The problem: instructions only have indices, not the actual coordinates
+        // We need to get them from the route line that's drawn on the map
+        
+        // Check if there's a waypoints array with route points
+        if (route.waypoints && route.waypoints.length > 0) {
+          allCoordinates = route.waypoints.map(wp => [wp.latLng.lng, wp.latLng.lat]);
+          console.log('Got coordinates from route.waypoints:', allCoordinates.length);
+        }
       }
       
-      // Create GeoJSON with or without elevation
+      // Fallback: use input waypoints (this is what's causing your bug!)
+      if (allCoordinates.length === 0) {
+        console.warn('Could not extract route coordinates! Falling back to input waypoints');
+        allCoordinates = waypointsRef.current.map(wp => [wp.lng, wp.lat]);
+      }
+
+      console.log('Final coordinates count:', allCoordinates.length);
+
+      // Calculate elevation
+      let ascendM = 0;
+      let descendM = 0;
+      
+      if (route.instructions) {
+        route.instructions.forEach(instruction => {
+          if (instruction.ascend) ascendM += instruction.ascend;
+          if (instruction.descend) descendM += instruction.descend;
+        });
+      }
+
+      // Create GeoJSON
       const geojson = {
         type: 'Feature',
         geometry: {
           type: 'LineString',
-          coordinates: elevationData ? elevationData.coordinates : basicCoordinates
+          coordinates: allCoordinates
         },
         properties: { 
           totalDistance, 
           totalTime,
-          elevationData: elevationData?.coordinates // Store 3D data if available
+          waypointCount: waypointsRef.current.length
         }
       };
 
-      // Calculate elevation changes
-      let ascendM = 0;
-      let descendM = 0;
-      
-      if (elevationData) {
-        // Use GraphHopper's calculated ascent/descent
-        ascendM = elevationData.ascend;
-        descendM = elevationData.descend;
-      } else {
-        // Fallback: try to calculate from route instructions
-        if (route.instructions) {
-          route.instructions.forEach(instruction => {
-            if (instruction.ascend) ascendM += instruction.ascend;
-            if (instruction.descend) descendM += instruction.descend;
-          });
-        }
-      }
+      console.log('Created GeoJSON with', allCoordinates.length, 'coordinates');
 
-      console.log('Route created with elevation:', {
-        distance: totalDistance,
-        ascend: ascendM,
-        descend: descendM,
-        hasElevationData: !!elevationData
-      });
-
-      // Defer callback to avoid setState during render
       setTimeout(() => {
         onRouteFound?.(geojson, totalDistance, ascendM, descendM);
       }, 0);
@@ -146,17 +127,17 @@ function RoutingMachine({ apiKey, onRouteFound, shouldCreateRoute = false, onWay
     return () => {
       map.off('click', handleMapClick);
     };
-  }, [map, apiKey, onRouteFound, onWaypointsChange, fetchElevationData]);
+  }, [map, apiKey, onRouteFound, onWaypointsChange]);
 
-  // Trigger routing when shouldCreateRoute changes to true
+  // Trigger routing
   React.useEffect(() => {
     if (shouldCreateRoute && routingControlRef.current && waypointsRef.current.length >= 2) {
       console.log('Creating route with waypoints:', waypointsRef.current);
-      routingControlRef.current.route(); // Manually trigger routing
+      routingControlRef.current.route();
     }
   }, [shouldCreateRoute]);
 
-  // Clear waypoints when shouldClearWaypoints changes to true
+  // Clear waypoints
   React.useEffect(() => {
     if (shouldClearWaypoints && routingControlRef.current) {
       console.log('Clearing waypoints');
@@ -164,13 +145,34 @@ function RoutingMachine({ apiKey, onRouteFound, shouldCreateRoute = false, onWay
       // Clear waypoints from routing control
       routingControlRef.current.setWaypoints([]);
       
+      // Clear the route from the map by removing and re-adding the control
+      // This is necessary because leaflet-routing-machine caches the route
+      map.removeControl(routingControlRef.current);
+      
+      // Create a fresh routing control
+      const control = L.Routing.control({
+        waypoints: [],
+        router: L.Routing.graphHopper(apiKey, {
+          urlParameters: { vehicle: 'foot' }
+        }),
+        autoRoute: true,
+        routeWhileDragging: false,
+        addWaypoints: false,
+        show: false,
+        lineOptions: {
+          styles: [{ color: 'blue', opacity: 0.7, weight: 4 }]
+        }
+      }).addTo(map);
+      
+      routingControlRef.current = control;
+      
       // Clear local state
       waypointsRef.current = [];
       
-      // Notify parent immediately
+      // Notify parent
       onWaypointsChange?.([]);
     }
-  }, [shouldClearWaypoints, onWaypointsChange]);
+  }, [shouldClearWaypoints, onWaypointsChange, map, apiKey]);
 
   return null;
 }
