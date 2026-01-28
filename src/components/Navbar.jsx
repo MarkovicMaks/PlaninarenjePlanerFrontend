@@ -43,7 +43,7 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <>
                   <Button as={RouterLink} to="/trails" className="NavbarButton">
-                    My Trails
+                    Trails
                   </Button>
                   <Button
                     as={RouterLink}
