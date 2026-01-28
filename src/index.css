@@ -96,7 +96,7 @@ button:focus-visible {
 }
 
 .NavBarInicial {
-  background-color: #bcf6e383;
+  background-color: #f6bcbc83;
   backdrop-filter: blur(10px);
   padding: 1em;
 
@@ -139,13 +139,6 @@ button:focus-visible {
   width: 100vw;
 }
 
-.MapInfo {
-  background-color: var(--card-bg);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  height: 11%;
-  width: 100%;
-}
 
 
 /* =========================

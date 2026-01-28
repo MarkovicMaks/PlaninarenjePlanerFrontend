@@ -52,8 +52,6 @@ export default function MapControls({
         {/* Clear button */}
         <Button
           size="sm"
-          variant="blue"
-          leftIcon={<Trash2 size={16} />}
           onClick={onClearWaypoints}
           isDisabled={waypointsCount === 0}
         >

@@ -1,7 +1,6 @@
 // src/pages/HomePage.jsx
 import InicialMap from "../components/Map/InicialMap";
 import Navbar from "../components/Navbar";
-import MapInfo from "../components/Map/MapInfo";
 import MapControls from "../components/Map/MapControls";
 import { useState, useCallback, useEffect } from "react";
 import { Box } from "@chakra-ui/react";
@@ -53,31 +52,27 @@ export default function HomePage() {
 
   return (
     <div className="HomeLayout">
-      <div>
-        <Navbar />
-        <Box position="relative" height="500px" width="100%" bg="gray.100">
-          <InicialMap
-            onRouteInfo={setRouteInfo}
-            onRouteCreated={handleRouteCreated}
-            onWaypointsChange={handleWaypointsChange}
-            shouldClearWaypoints={shouldClearWaypoints}
-          />
+      {/* Top navbar */}
+      <Navbar />
 
-          <MapControls
-            waypointsCount={waypoints.length}
-            onClearWaypoints={handleClearWaypoints}
-            routeInfo={routeInfo}
-            currentRoute={currentRoute}
-            onTrailSaved={handleTrailSaved}
-          />
-        </Box>
+      {/* Map fills the rest of the page */}
+      <Box position="relative" flex="1" width="100%" bg="gray.100">
+        <InicialMap
+          onRouteInfo={setRouteInfo}
+          onRouteCreated={handleRouteCreated}
+          onWaypointsChange={handleWaypointsChange}
+          // we no longer use shouldCreateRoute, only clear
+          shouldClearWaypoints={shouldClearWaypoints}
+        />
 
-        <MapInfo
+        <MapControls
+          waypointsCount={waypoints.length}
+          onClearWaypoints={handleClearWaypoints}
           routeInfo={routeInfo}
           currentRoute={currentRoute}
-          onClearAfterSave={handleTrailSaved}
+          onTrailSaved={handleTrailSaved}
         />
-      </div>
+      </Box>
     </div>
   );
 }
