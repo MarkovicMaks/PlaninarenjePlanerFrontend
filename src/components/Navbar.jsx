@@ -8,10 +8,10 @@ import {
   Button,
   Icon,
   Text,
-} from '@chakra-ui/react';
-import { Menu, X, LogOut } from 'lucide-react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext.jsx';
+} from "@chakra-ui/react";
+import { Menu, X, LogOut } from "lucide-react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -32,24 +32,31 @@ export default function Navbar() {
           as="nav"
           spacing={8}
           alignItems="center"
-          display={{ base: 'none', md: 'flex' }}
+          display={{ base: "none", md: "flex" }}
         >
-          <Button as={RouterLink} to="/" className='NavbarButton'>
+          <Button as={RouterLink} to="/" className="NavbarButton">
             Home
           </Button>
-          
+
           {!loading && (
             <>
               {isAuthenticated ? (
                 <>
-                  <Button as={RouterLink} to="/trails" className='NavbarButton'>
+                  <Button as={RouterLink} to="/trails" className="NavbarButton">
+                    My Trails
+                  </Button>
+                  <Button
+                    as={RouterLink}
+                    to="/my-trails"
+                    className="NavbarButton"
+                  >
                     My Trails
                   </Button>
                   <Text fontSize="sm">Welcome, {user?.fullName}!</Text>
-                  <Button 
+                  <Button
                     leftIcon={<Icon as={LogOut} />}
                     onClick={handleLogout}
-                    className='NavbarButton'
+                    className="NavbarButton"
                     variant="outline"
                   >
                     Logout
@@ -57,10 +64,10 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <Button as={RouterLink} to="/login" className='NavbarButton'>
+                  <Button as={RouterLink} to="/login" className="NavbarButton">
                     Login
                   </Button>
-                  <Button as={RouterLink} to="/signup" className='NavbarButton'>
+                  <Button as={RouterLink} to="/signup" className="NavbarButton">
                     Sign Up
                   </Button>
                 </>
@@ -71,20 +78,20 @@ export default function Navbar() {
 
         <IconButton
           size="md"
-          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          aria-label={isOpen ? "Close menu" : "Open menu"}
           icon={<Icon as={isOpen ? X : Menu} boxSize={5} />}
-          display={{ md: 'none' }}
+          display={{ md: "none" }}
           onClick={isOpen ? onClose : onOpen}
         />
       </Flex>
 
       {isOpen && (
-        <Box pb={4} display={{ md: 'none' }}>
+        <Box pb={4} display={{ md: "none" }}>
           <Stack as="nav" spacing={4}>
             <Button as={RouterLink} to="/" variant="ghost">
               Home
             </Button>
-            
+
             {!loading && (
               <>
                 {isAuthenticated ? (
@@ -93,7 +100,7 @@ export default function Navbar() {
                       My Trails
                     </Button>
                     <Text fontSize="sm">Welcome, {user?.fullName}!</Text>
-                    <Button 
+                    <Button
                       leftIcon={<Icon as={LogOut} />}
                       onClick={handleLogout}
                       variant="ghost"

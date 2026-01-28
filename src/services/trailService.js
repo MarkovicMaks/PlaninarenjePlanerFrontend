@@ -154,7 +154,15 @@ class TrailService {
       throw error;
     }
   }
-
+  async getMyTrails() {
+  try {
+    const response = await this.api.get('/trails/my-trails');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching my trails:', error);
+    throw error;
+  }
+}
   // Obriši stazu
   async deleteTrail(id) {
     try {
