@@ -39,8 +39,6 @@ export default function TrailExpandedMapSection({
     <Box
       mt={3}
       p={4}
-      bg="white"
-      // prevent clicks inside the expanded area from re-triggering card click
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}

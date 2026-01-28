@@ -162,72 +162,7 @@ export default function MyTrailsPage() {
                       onClick={() => handleTrailSelect(trail)}
                       isSelected={selectedTrail?.id === trail.id}
                     />
-
-                    {/* Expandable Map Below Card */}
-                    {selectedTrail?.id === trail.id && (
-                      <Box
-                        mt={3}
-                        p={4}
-                        bg="white"
-                        borderRadius="md"
-                        border="2px solid"
-                        borderColor="blue.500"
-                        shadow="lg"
-                      >
-                        {/* Map Header */}
-                        <HStack justify="space-between" mb={3}>
-                          <VStack align="start" spacing={1}>
-                            <Text fontSize="lg" fontWeight="bold">
-                              {selectedTrail?.name}
-                            </Text>
-                            <HStack spacing={4} fontSize="sm" color="gray.600">
-                              <Text>📍 {selectedTrail?.lengthKm} km</Text>
-                              <Text>
-                                📌 {selectedTrail?.waypoints?.length} waypoints
-                              </Text>
-                              {selectedTrail?.totalAscent && (
-                                <>
-                                  <Text>
-                                    ⛰️ ↗ {Math.round(selectedTrail.totalAscent)}
-                                    m
-                                  </Text>
-                                  <Text>
-                                    ⛰️ ↘{" "}
-                                    {Math.round(selectedTrail.totalDescent)}m
-                                  </Text>
-                                </>
-                              )}
-                            </HStack>
-                          </VStack>
-
-                          <Button
-                            size="sm"
-                            leftIcon={<X size={16} />}
-                            onClick={handleCloseMap}
-                            variant="ghost"
-                          >
-                            Close Map
-                          </Button>
-                        </HStack>
-
-                        {/* Elevation Graph */}
-                        {selectedTrail?.minElevation !== null &&
-                          selectedTrail?.maxElevation !== null && (
-                            <Box mb={3}>
-                              <ElevationGraph
-                                waypoints={selectedTrail.waypoints}
-                                totalAscent={selectedTrail.totalAscent}
-                                totalDescent={selectedTrail.totalDescent}
-                              />
-                            </Box>
-                          )}
-
-                        {/* Map Container */}
-                        <Box height="500px" borderRadius="md" overflow="hidden">
-                          <TrailMap trail={selectedTrail} />
-                        </Box>
-                      </Box>
-                    )}
+                    
                   </Box>
                 ))}
               </VStack>
@@ -272,7 +207,7 @@ export default function MyTrailsPage() {
                             <Button
                               key={page}
                               size="sm"
-                              variant={currentPage === page ? "solid" : "ghost"}
+                              variant={currentPage === page ? "solid" : "unstyled"}
                               colorScheme={
                                 currentPage === page ? "blue" : "gray"
                               }

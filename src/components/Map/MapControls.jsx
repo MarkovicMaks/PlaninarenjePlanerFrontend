@@ -18,7 +18,7 @@ export default function MapControls({
       top={4}
       right={4}
       zIndex={1000}
-      bg="white"
+      bg="var(--card-bg)"
       p={4}
       borderRadius="md"
       shadow="lg"

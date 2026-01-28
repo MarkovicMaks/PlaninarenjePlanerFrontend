@@ -3,6 +3,13 @@
   line-height: 1.5;
   font-weight: 400;
 
+  /* === Card system === */
+  --card-bg: #FAF9F4;
+  --card-bg-hover: #F4EEDC;
+  --card-bg-selected: #EFE6D2;
+  --card-border: #e2e2e2;
+  --card-border-selected: #3182ce; /* Chakra blue.500 */
+
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background: url("./assets/svg/layered-peaks-haikei.svg") center / cover
@@ -13,6 +20,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 
 a {
   font-weight: 500;
@@ -50,12 +58,8 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
 }
 button:focus,
 button:focus-visible {
@@ -65,13 +69,11 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: #FAF9F4;
   }
-  a:hover {
-    color: #747bff;
-  }
+  
   button {
-    background-color: #f9f9f9;
+    background-color: #FAF9F4;
   }
 }
 
@@ -103,7 +105,7 @@ button:focus-visible {
 }
 
 .NavbarButton{
-  color: #ffffff;
+  color: #FAF9F4;
   background: transparent;
   text-decoration: none;
 }
@@ -138,9 +140,39 @@ button:focus-visible {
 }
 
 .MapInfo {
-  background-color: #99ddc8a6;
+  background-color: var(--card-bg);
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   height: 11%;
   width: 100%;
+}
+
+
+/* =========================
+   Card styles (global)
+   ========================= */
+
+.card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.card-hover:hover {
+  background-color: var(--card-bg-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card-selected {
+  background-color: var(--card-bg-selected);
+  border-color: var(--card-border-selected);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Larger cards (map / expanded sections) */
+.card-elevated {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }

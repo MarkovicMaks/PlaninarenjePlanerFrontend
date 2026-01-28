@@ -88,7 +88,7 @@ export default function Navbar() {
       {isOpen && (
         <Box pb={4} display={{ md: "none" }}>
           <Stack as="nav" spacing={4}>
-            <Button as={RouterLink} to="/" variant="ghost">
+            <Button as={RouterLink} to="/" >
               Home
             </Button>
 

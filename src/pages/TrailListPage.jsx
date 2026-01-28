@@ -108,8 +108,8 @@ export default function TrailListPage() {
         <VStack align="stretch" spacing={6}>
           {/* Header */}
           <Box>
-            <Text fontSize="2xl" fontWeight="bold" color="gray.800">
-              Your Saved Trails
+            <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+              Trails
             </Text>
             <Text color="gray.600">
               {allTrails.length} trail{allTrails.length !== 1 ? "s" : ""} total
@@ -172,7 +172,7 @@ export default function TrailListPage() {
                       leftIcon={<ChevronLeft size={16} />}
                       onClick={goToPrevPage}
                       isDisabled={currentPage === 1}
-                      variant="outline"
+                      variant="Ghost"
                     >
                       Previous
                     </Button>
@@ -183,15 +183,15 @@ export default function TrailListPage() {
                         (page) => {
                           // Show current page, first, last, and pages around current
                           const shouldShow =
-                            page === 1 ||
+                            page === 2 ||
                             page === totalPages ||
-                            Math.abs(page - currentPage) <= 1;
+                            Math.abs(page - currentPage) <= 2;
 
                           if (!shouldShow) {
                             // Show ellipsis for gaps
                             if (
-                              page === currentPage - 2 ||
-                              page === currentPage + 2
+                              page === currentPage - 3 ||
+                              page === currentPage + 3
                             ) {
                               return (
                                 <Text key={page} fontSize="sm">
@@ -206,9 +206,9 @@ export default function TrailListPage() {
                             <Button
                               key={page}
                               size="sm"
-                              variant={currentPage === page ? "solid" : "ghost"}
+                              variant={currentPage === page ? "solid" : "unstyled"}
                               colorScheme={
-                                currentPage === page ? "blue" : "gray"
+                                currentPage === page ? "red" : "gray"
                               }
                               onClick={() => goToPage(page)}
                               minW="8"
@@ -222,10 +222,9 @@ export default function TrailListPage() {
 
                     <Button
                       size="sm"
-                      rightIcon={<ChevronRight size={16} />}
                       onClick={goToNextPage}
                       isDisabled={currentPage === totalPages}
-                      variant="outline"
+                      variant="unstyled"
                     >
                       Next
                     </Button>
