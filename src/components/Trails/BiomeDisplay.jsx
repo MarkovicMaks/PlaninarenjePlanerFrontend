@@ -113,12 +113,6 @@ export default function BiomeDisplay({ biomes }) {
           ))}
         </VStack>
       )}
-
-      {biomes.analyzedAt && (
-        <Text fontSize="xs" color="gray.400">
-          Analyzed: {formatDate(biomes.analyzedAt)}
-        </Text>
-      )}
     </VStack>
   );
 }

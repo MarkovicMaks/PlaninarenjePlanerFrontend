@@ -1,12 +1,12 @@
 // src/components/Trails/TrailCard.jsx
 import { useState } from 'react';
 import { Box, Text, VStack, HStack, Badge } from '@chakra-ui/react';
-import { MapPin, Clock, TrendingUp, TrendingDown, Mountain } from 'lucide-react';
+import { MapPin, Clock, TrendingUp, Mountain } from 'lucide-react';
 import BiomeDisplay from './BiomeDisplay';
-import ElevationGraph from './ElevationGraph';
 import InteractiveStarRating from './InteractiveStarRating';
 import { trailService } from '../../services/trailService';
 import { useAuth } from '../../contexts/AuthContext';
+import TrailExpandedMapSection from './TrailExpandedMapSection';
 
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
@@ -21,14 +21,6 @@ export default function TrailCard({ trail, onClick, isSelected = false, onRating
   const { isAuthenticated } = useAuth();
   const [ratingStats, setRatingStats] = useState(trail.ratingStats);
   const [isRating, setIsRating] = useState(false);
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   const hasElevationData = trail.minElevation !== null && trail.maxElevation !== null;
 
@@ -64,18 +56,13 @@ export default function TrailCard({ trail, onClick, isSelected = false, onRating
   return (
     <Box
       p={4}
-      bg={isSelected ? 'blue.50' : 'white'}
-      border={isSelected ? '2px solid' : '1px solid'}
-      borderColor={isSelected ? 'blue.500' : 'gray.200'}
+      bg={ 'white'}
       borderRadius="md"
       shadow={isSelected ? 'lg' : 'sm'}
       cursor="pointer"
       onClick={handleCardClick}
-      _hover={{
-        shadow: 'md',
-        bg: isSelected ? 'blue.100' : 'gray.50'
-      }}
-      transition="all 0.2s"
+      
+      transition="all 0.5s"
     >
       <VStack align="stretch" spacing={3}>
         {/* Trail Name and Difficulty */}
@@ -144,12 +131,19 @@ export default function TrailCard({ trail, onClick, isSelected = false, onRating
             {trail.description}
           </Text>
         )}
-
-        {/* Created Date */}
-        <Text fontSize="xs" color="gray.500">
-          Created: {formatDate(trail.createdAt)}
-        </Text>
       </VStack>
+
+      {/* 🔽 Expanded Map + Elevation section inside the card */}
+      {isSelected && (
+        <TrailExpandedMapSection
+          trail={trail}
+          onClose={() => {
+            // reuse the same toggle logic as clicking the card:
+            // if parent toggles selection on click, this will "unselect"
+            onClick?.();
+          }}
+        />
+      )}
     </Box>
   );
 }

@@ -48,7 +48,16 @@ function FitBounds({ waypoints }) {
 export default function TrailMap({ trail }) {
   if (!trail || !trail.waypoints || trail.waypoints.length === 0) {
     return (
-      <div style={{ height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7f7f7' }}>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f7f7f7',
+        }}
+      >
         <p>Select a trail to view on map</p>
       </div>
     );
@@ -68,7 +77,7 @@ export default function TrailMap({ trail }) {
   const endWaypoint = sortedWaypoints[sortedWaypoints.length - 1];
 
   return (
-    <div style={{ height: '80%', width: '50vw' }}>
+    <div style={{ height: '100%', width: '100%' }}>
       <MapContainer
         center={[centerLat, centerLng]}
         zoom={13}
