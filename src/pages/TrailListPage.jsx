@@ -16,11 +16,17 @@ import { trailService } from "../services/trailService.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import Navbar from "../components/Navbar.jsx";
 import TrailCard from "../components/Trails/TrailCard.jsx";
+import TrailFilters from "../components/TrailFilters.jsx";
 
 const TRAILS_PER_PAGE = 10;
 
 export default function TrailListPage() {
   const [allTrails, setAllTrails] = useState([]);
+  const [filteredTrails, setFilteredTrails] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBiome, setSelectedBiome] = useState("");
+  const [minLength, setMinLength] = useState(0);
+  const [maxLength, setMaxLength] = useState(50);
   const [selectedTrail, setSelectedTrail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,6 +36,37 @@ export default function TrailListPage() {
   useEffect(() => {
     loadTrails();
   }, []);
+
+  // Filter trails when search query, biome, or length changes
+  useEffect(() => {
+    let filtered = allTrails;
+
+    // Filter by search query
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(trail =>
+        trail.name.toLowerCase().includes(query) ||
+        trail.description?.toLowerCase().includes(query) ||
+        trail.createdBy?.fullName?.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by biome (dominant biome must match)
+    if (selectedBiome) {
+      filtered = filtered.filter(trail => 
+        trail.biomes?.dominantBiome === selectedBiome
+      );
+    }
+
+    // Filter by length range
+    filtered = filtered.filter(trail => {
+      const length = parseFloat(trail.lengthKm);
+      return length >= minLength && (maxLength === 50 ? true : length <= maxLength);
+    });
+
+    setFilteredTrails(filtered);
+    setCurrentPage(1); // Reset to first page when filtering
+  }, [searchQuery, selectedBiome, minLength, maxLength, allTrails]);
 
   const loadTrails = async () => {
     try {
@@ -43,6 +80,7 @@ export default function TrailListPage() {
       );
 
       setAllTrails(sortedTrails);
+      setFilteredTrails(sortedTrails);
     } catch (error) {
       console.error("Error loading trails:", error);
       setError("Failed to load trails. Please try again.");
@@ -59,15 +97,26 @@ export default function TrailListPage() {
     }
   };
 
-  // Calculate pagination
-  const totalPages = Math.ceil(allTrails.length / TRAILS_PER_PAGE);
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedBiome("");
+    setMinLength(0);
+    setMaxLength(50);
+  };
+
+  // Calculate pagination based on filtered trails
+  const totalPages = Math.ceil(filteredTrails.length / TRAILS_PER_PAGE);
   const startIndex = (currentPage - 1) * TRAILS_PER_PAGE;
   const endIndex = startIndex + TRAILS_PER_PAGE;
-  const currentTrails = allTrails.slice(startIndex, endIndex);
+  const currentTrails = filteredTrails.slice(startIndex, endIndex);
 
   const goToPage = (page) => {
     setCurrentPage(page);
-    setSelectedTrail(null); // Close map when changing pages
+    setSelectedTrail(null);
   };
 
   const goToPrevPage = () => {
@@ -112,15 +161,34 @@ export default function TrailListPage() {
               Trails
             </Text>
             <Text color="gray.600">
-              {allTrails.length} trail{allTrails.length !== 1 ? "s" : ""} total
-              {allTrails.length > TRAILS_PER_PAGE && (
+              {filteredTrails.length} trail{filteredTrails.length !== 1 ? "s" : ""} 
+              {(searchQuery || selectedBiome) && " found"}
+              {filteredTrails.length > TRAILS_PER_PAGE && (
                 <span>
                   {" "}
                   • Showing {startIndex + 1}-
-                  {Math.min(endIndex, allTrails.length)}
+                  {Math.min(endIndex, filteredTrails.length)}
                 </span>
               )}
             </Text>
+          </Box>
+
+          {/* Trail Filters */}
+          <Box>
+            <TrailFilters
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onSearchClear={clearSearch}
+              selectedBiome={selectedBiome}
+              onBiomeChange={setSelectedBiome}
+              minLength={minLength}
+              maxLength={maxLength}
+              onLengthRangeChange={([min, max]) => {
+                setMinLength(min);
+                setMaxLength(max);
+              }}
+              searchPlaceholder="Search trails by name, description, or creator..."
+            />
           </Box>
 
           {loading && (
@@ -138,7 +206,7 @@ export default function TrailListPage() {
             </Alert>
           )}
 
-          {!loading && !error && allTrails.length === 0 && (
+          {!loading && !error && filteredTrails.length === 0 && allTrails.length === 0 && (
             <Box textAlign="center" py={8}>
               <Text fontSize="lg" color="gray.600">
                 No trails saved yet. Create your first trail!
@@ -146,7 +214,18 @@ export default function TrailListPage() {
             </Box>
           )}
 
-          {!loading && !error && allTrails.length > 0 && (
+          {!loading && !error && filteredTrails.length === 0 && allTrails.length > 0 && (
+            <Box textAlign="center" py={8}>
+              <Text fontSize="lg" color="gray.600" mb={2}>
+                No trails found with current filters
+              </Text>
+              <Button mt={4} onClick={clearFilters} variant="outline">
+                Clear All Filters
+              </Button>
+            </Box>
+          )}
+
+          {!loading && !error && filteredTrails.length > 0 && (
             <>
               {/* Trail Cards */}
               <VStack align="stretch" spacing={3}>
@@ -169,7 +248,7 @@ export default function TrailListPage() {
                       size="sm"
                       leftIcon={<ChevronLeft size={16} />}
                       onClick={goToPrevPage}
-                      isDisabled={currentPage === 1}
+                      disabled={currentPage === 1}
                       variant="Ghost"
                     >
                       Previous
@@ -218,7 +297,7 @@ export default function TrailListPage() {
                     <Button
                       size="sm"
                       onClick={goToNextPage}
-                      isDisabled={currentPage === totalPages}
+                      disabled={currentPage === totalPages}
                       variant="unstyled"
                     >
                       Next
