@@ -11,13 +11,11 @@ import {
   Button,
   Flex,
 } from "@chakra-ui/react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { trailService } from "../services/trailService.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import Navbar from "../components/Navbar.jsx";
 import TrailCard from "../components/Trails/TrailCard.jsx";
-import TrailMap from "../components/Trails/TrailMap.jsx";
-import ElevationGraph from "../components/Trails/ElevationGraph.jsx";
 
 const TRAILS_PER_PAGE = 10;
 
@@ -61,10 +59,6 @@ export default function TrailListPage() {
     }
   };
 
-  const handleCloseMap = () => {
-    setSelectedTrail(null);
-  };
-
   // Calculate pagination
   const totalPages = Math.ceil(allTrails.length / TRAILS_PER_PAGE);
   const startIndex = (currentPage - 1) * TRAILS_PER_PAGE;
@@ -90,23 +84,29 @@ export default function TrailListPage() {
 
   if (!isAuthenticated) {
     return (
-      <>
+      <Box display="flex" flexDirection="column" height="100vh">
         <Navbar />
         <Box p={8} textAlign="center">
           <Text fontSize="lg" color="gray.600">
             Please log in to view saved trails.
           </Text>
         </Box>
-      </>
+      </Box>
     );
   }
 
   return (
-    <>
+    <Box display="flex" flexDirection="column" height="100vh" overflow="hidden">
       <Navbar />
-      <Box p={4} w="100%" maxW="100vw">
-        <VStack align="stretch" spacing={6}>
-          {/* Header */}
+      
+      {/* Scrollable content area */}
+      <Box 
+        flex="1" 
+        overflowY="auto" 
+        p={4}
+      >
+        <VStack align="stretch" spacing={6} maxW="100%" mx="auto">
+          {/* Header - scrolls away with content */}
           <Box>
             <Text fontSize="3xl" fontWeight="bold" color="gray.800">
               Trails
@@ -148,7 +148,7 @@ export default function TrailListPage() {
 
           {!loading && !error && allTrails.length > 0 && (
             <>
-              {/* Trail Cards - Full Width */}
+              {/* Trail Cards */}
               <VStack align="stretch" spacing={3}>
                 {currentTrails.map((trail) => (
                   <Box key={trail.id}>
@@ -157,8 +157,6 @@ export default function TrailListPage() {
                       onClick={() => handleTrailSelect(trail)}
                       isSelected={selectedTrail?.id === trail.id}
                     />
-
-                    
                   </Box>
                 ))}
               </VStack>
@@ -178,17 +176,14 @@ export default function TrailListPage() {
                     </Button>
 
                     <HStack spacing={2}>
-                      {/* Page numbers */}
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                         (page) => {
-                          // Show current page, first, last, and pages around current
                           const shouldShow =
                             page === 2 ||
                             page === totalPages ||
                             Math.abs(page - currentPage) <= 2;
 
                           if (!shouldShow) {
-                            // Show ellipsis for gaps
                             if (
                               page === currentPage - 3 ||
                               page === currentPage + 3
@@ -244,6 +239,6 @@ export default function TrailListPage() {
           )}
         </VStack>
       </Box>
-    </>
+    </Box>
   );
 }

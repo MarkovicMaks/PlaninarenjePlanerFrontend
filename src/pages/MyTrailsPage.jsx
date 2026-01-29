@@ -11,7 +11,7 @@ import {
   Button,
   Flex,
 } from "@chakra-ui/react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { trailService } from "../services/trailService.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import Navbar from "../components/Navbar.jsx";
@@ -62,10 +62,6 @@ export default function MyTrailsPage() {
     }
   };
 
-  const handleCloseMap = () => {
-    setSelectedTrail(null);
-  };
-
   // Calculate pagination
   const totalPages = Math.ceil(allTrails.length / TRAILS_PER_PAGE);
   const startIndex = (currentPage - 1) * TRAILS_PER_PAGE;
@@ -91,25 +87,31 @@ export default function MyTrailsPage() {
 
   if (!isAuthenticated) {
     return (
-      <>
+      <Box display="flex" flexDirection="column" height="100vh">
         <Navbar />
         <Box p={8} textAlign="center">
           <Text fontSize="lg" color="gray.600">
             Please log in to view your trails.
           </Text>
         </Box>
-      </>
+      </Box>
     );
   }
 
   return (
-    <>
+    <Box display="flex" flexDirection="column" height="100vh" overflow="hidden">
       <Navbar />
-      <Box p={4} w="100%" maxW="100vw">
-        <VStack align="stretch" spacing={6}>
-          {/* Header */}
+      
+      {/* Scrollable content area */}
+      <Box 
+        flex="1" 
+        overflowY="auto" 
+        p={4}
+      >
+        <VStack align="stretch" spacing={6} maxW="100%" mx="auto">
+          {/* Header - scrolls away with content */}
           <Box>
-            <Text fontSize="2xl" fontWeight="bold" color="#283f3b">
+            <Text fontSize="3xl" fontWeight="bold" color="gray.800">
               My Created Trails
             </Text>
             <Text color="gray.600">
@@ -151,7 +153,7 @@ export default function MyTrailsPage() {
 
           {!loading && !error && allTrails.length > 0 && (
             <>
-              {/* Trail Cards - Full Width */}
+              {/* Trail Cards */}
               <VStack align="stretch" spacing={3}>
                 {currentTrails.map((trail) => (
                   <Box key={trail.id}>
@@ -160,7 +162,6 @@ export default function MyTrailsPage() {
                       onClick={() => handleTrailSelect(trail)}
                       isSelected={selectedTrail?.id === trail.id}
                     />
-                    
                   </Box>
                 ))}
               </VStack>
@@ -173,7 +174,7 @@ export default function MyTrailsPage() {
                       size="sm"
                       leftIcon={<ChevronLeft size={16} />}
                       onClick={goToPrevPage}
-                      isDisabled={currentPage === 1}
+                      disabled={currentPage === 1}
                       variant="outline"
                     >
                       Previous
@@ -223,7 +224,7 @@ export default function MyTrailsPage() {
                       size="sm"
                       rightIcon={<ChevronRight size={16} />}
                       onClick={goToNextPage}
-                      isDisabled={currentPage === totalPages}
+                      disabled={currentPage === totalPages}
                       variant="outline"
                     >
                       Next
@@ -244,6 +245,6 @@ export default function MyTrailsPage() {
           )}
         </VStack>
       </Box>
-    </>
+    </Box>
   );
 }

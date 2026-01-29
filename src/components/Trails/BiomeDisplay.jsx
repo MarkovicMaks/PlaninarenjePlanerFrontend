@@ -32,39 +32,31 @@ const getBiomeName = (biomeType) => {
 export default function BiomeDisplay({ biomes }) {
   if (!biomes) return null;
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
   // Get ALL biomes for the proportional bar
   const getAllBiomes = () => {
-  const biomeTypes = ['zimzelena', 'listopadna', 'livade', 'urbano', 'polja', 'vode'];
-  
-  return biomeTypes
-    .map(type => ({ 
-      type, 
-      percentage: biomes[`${type}Percentage`] 
-    }))
-    .filter(biome => biome.percentage > 0)
-    .sort((a, b) => b.percentage - a.percentage);
-};
+    const biomeTypes = ['zimzelena', 'listopadna', 'livade', 'urbano', 'polja', 'vode'];
+    
+    return biomeTypes
+      .map(type => ({ 
+        type, 
+        percentage: biomes[`${type}Percentage`] 
+      }))
+      .filter(biome => biome.percentage > 0)
+      .sort((a, b) => b.percentage - a.percentage);
+  };
 
   // Get significant biomes (> 5%) for the text list
   const getSignificantBiomes = () => {
-  const biomeTypes = ['zimzelena', 'listopadna', 'livade', 'urbano', 'polja', 'vode'];
-  
-  return biomeTypes
-    .map(type => ({ 
-      type, 
-      percentage: biomes[`${type}Percentage`] 
-    }))
-    .filter(biome => biome.percentage > 5)
-    .sort((a, b) => b.percentage - a.percentage);
-};
+    const biomeTypes = ['zimzelena', 'listopadna', 'livade', 'urbano', 'polja', 'vode'];
+    
+    return biomeTypes
+      .map(type => ({ 
+        type, 
+        percentage: biomes[`${type}Percentage`] 
+      }))
+      .filter(biome => biome.percentage > 5)
+      .sort((a, b) => b.percentage - a.percentage);
+  };
 
   const allBiomes = getAllBiomes();
   const significantBiomes = getSignificantBiomes();
@@ -83,35 +75,72 @@ export default function BiomeDisplay({ biomes }) {
 
       {/* Proportional Biome Bar */}
       {allBiomes.length > 0 && (
-        <HStack gap={0} width="100%" height="20px" borderRadius="md" overflow="hidden">
-          {allBiomes.map((biome) => (
-            <Box
-              key={biome.type}
-              width={`${biome.percentage}%`}
-              height="100%"
-              bg={getBiomeColor(biome.type)}
-              title={`${getBiomeName(biome.type)}: ${biome.percentage}%`}
-              transition="all 0.2s"
-              _hover={{
-                opacity: 0.8
-              }}
-            />
-          ))}
-        </HStack>
-      )}
+        <Box position="relative">
+          <HStack gap={0} width="100%" height="20px" borderRadius="md" overflow="hidden">
+            {allBiomes.map((biome) => (
+              <Box
+                key={biome.type}
+                width={`${biome.percentage}%`}
+                height="100%"
+                bg={getBiomeColor(biome.type)}
+                title={`${getBiomeName(biome.type)}: ${biome.percentage}%`}
+                transition="all 0.2s"
+                _hover={{
+                  opacity: 0.8
+                }}
+              />
+            ))}
+          </HStack>
 
-      {/* Show top biomes with just text */}
-      {significantBiomes.length > 0 && (
-        <VStack align="stretch" spacing={1}>
-          {significantBiomes.slice(0, 3).map((biome) => (
-            <HStack key={biome.type} justify="space-between" fontSize="xs">
-              <Text color="gray.600">{getBiomeName(biome.type)}</Text>
-              <Text fontWeight="medium" color="green.600">
-                {biome.percentage}%
-              </Text>
-            </HStack>
-          ))}
-        </VStack>
+          {/* Labels overlaid on the bar - positioned where colors change */}
+          <HStack 
+            position="absolute" 
+            top="0" 
+            left="0" 
+            width="100%" 
+            height="20px"
+            gap={0}
+            pointerEvents="none"
+          >
+            {significantBiomes.map((biome, index) => {
+              // Calculate the start position (sum of all previous percentages)
+              const startPos = allBiomes
+                .slice(0, allBiomes.findIndex(b => b.type === biome.type))
+                .reduce((sum, b) => sum + parseFloat(b.percentage), 0);
+              
+              const width = parseFloat(biome.percentage);
+              
+              // Only show label if there's enough room (at least 15% width)
+              if (width < 15) return null;
+
+              return (
+                <Box
+                  key={biome.type}
+                  position="absolute"
+                  left={`${startPos}%`}
+                  width={`${width}%`}
+                  height="100%"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  px={1}
+                >
+                  <Text 
+                    fontSize="10px" 
+                    fontWeight="bold" 
+                    color="white"
+                    textShadow="0 1px 2px rgba(0,0,0,0.5)"
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                  >
+                    {getBiomeName(biome.type)} {biome.percentage}%
+                  </Text>
+                </Box>
+              );
+            })}
+          </HStack>
+        </Box>
       )}
     </VStack>
   );
