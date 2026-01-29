@@ -9,7 +9,8 @@ import {
   Icon,
   Text,
 } from "@chakra-ui/react";
-import { Menu, X, LogOut } from "lucide-react";
+import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "@chakra-ui/react";
+import { Menu, X, LogOut, User, Settings, ChevronDown } from "lucide-react";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
@@ -73,23 +74,87 @@ export default function Navbar() {
                   >
                     Trails
                   </Button>
-                  <Button
-                    as={RouterLink}
-                    to="/my-trails"
-                    className="NavbarButton"
-                    {...navButtonStyles("/my-trails")}
-                  >
-                    My Trails
-                  </Button>
-                  <Text color={"--deep-gr-txt"} fontWeight={"600"}>Welcome {user?.fullName}!</Text>
-                  <Button
-                    leftIcon={<Icon as={LogOut} />}
-                    onClick={handleLogout}
-                    className="NavbarButton"
-                    variant="outline"
-                  >
-                    Logout
-                  </Button>
+
+                  {/* User Dropdown */}
+                  <Box>
+                    <MenuRoot>
+                      <MenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          color="--deep-gr-txt"
+                          _hover={{ bg: "#95BF74" }}
+                          px={3}
+                          py={2}
+                        >
+                          <HStack spacing={1}>
+                            <User size={16} />
+                            <Text fontSize="sm" fontWeight="600">
+                              {user?.fullName || 'User'}
+                            </Text>
+                            <ChevronDown size={16} />
+                          </HStack>
+                        </Button>
+                      </MenuTrigger>
+
+                      <MenuContent
+                        minW="180px"
+                        bg="white"
+                        shadow="lg"
+                        borderRadius="md"
+                        border="1px solid"
+                        borderColor="gray.200"
+                        p={1}
+                        zIndex={1000}
+                        position="fixed"
+                        mt="10px"
+                      >
+                        <MenuItem
+                          value="my-trails"
+                          onClick={() => navigate('/my-trails')}
+                          px={3}
+                          py={2}
+                          borderRadius="sm"
+                          _hover={{ bg: "gray.100" }}
+                          cursor="pointer"
+                        >
+                          <HStack spacing={2} width="100%">
+                            <Icon as={Menu} boxSize={4} />
+                            <Text fontSize="sm">My Trails</Text>
+                          </HStack>
+                        </MenuItem>
+
+                        <MenuItem
+                          value="profile"
+                          onClick={() => navigate('/profile')}
+                          px={3}
+                          py={2}
+                          borderRadius="sm"
+                          _hover={{ bg: "gray.100" }}
+                          cursor="pointer"
+                        >
+                          <HStack spacing={2} width="100%">
+                            <Settings size={16} />
+                            <Text fontSize="sm">Edit Profile</Text>
+                          </HStack>
+                        </MenuItem>
+
+                        <MenuItem
+                          value="logout"
+                          onClick={handleLogout}
+                          px={3}
+                          py={2}
+                          borderRadius="sm"
+                          _hover={{ bg: "red.50" }}
+                          cursor="pointer"
+                        >
+                          <HStack spacing={2} width="100%">
+                            <LogOut size={16} color="#DC2626" />
+                            <Text fontSize="sm" color="red.600">Logout</Text>
+                          </HStack>
+                        </MenuItem>
+                      </MenuContent>
+                    </MenuRoot>
+                  </Box>
                 </>
               ) : (
                 <>
@@ -160,7 +225,18 @@ export default function Navbar() {
                     >
                       My Trails
                     </Button>
-                    <Text color={"#FFF"} >Welcome, {user?.fullName}!</Text>
+                    <Button
+                      as={RouterLink}
+                      to="/profile/edit"
+                      variant="ghost"
+                      onClick={onClose}
+                    >
+                      <HStack spacing={2}>
+                        <Settings size={16} />
+                        <Text>Edit Profile</Text>
+                      </HStack>
+                    </Button>
+                    <Text color={"#FFF"}>Welcome, {user?.fullName}!</Text>
                     <Button
                       leftIcon={<Icon as={LogOut} />}
                       onClick={() => {

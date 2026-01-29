@@ -56,7 +56,8 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API functions
+// ============= AUTH FUNCTIONS =============
+
 export const authService = {
   async signup(userData) {
     const response = await api.post('/auth/signup', userData);
@@ -108,6 +109,35 @@ export const authService = {
     const token = localStorage.getItem('access_token');
     return !!token;
   },
+};
+
+// ============= USER PROFILE FUNCTIONS (NEW) =============
+
+export const userService = {
+  async updateProfile(userData) {
+    const response = await api.put('/users/me', userData);
+    
+    // Update stored user info
+    if (response.data) {
+      localStorage.setItem('user', JSON.stringify(response.data));
+    }
+    
+    return response.data;
+  },
+
+  async deleteAccount() {
+    await api.delete('/users/me');
+    
+    // Clear all auth data
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+  },
+
+  async getCurrentUser() {
+    const response = await api.get('/users/me');
+    return response.data;
+  }
 };
 
 // Export individual functions for convenience
