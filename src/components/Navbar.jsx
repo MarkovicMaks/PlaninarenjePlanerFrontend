@@ -30,10 +30,10 @@ export default function Navbar() {
     const active = isActive(path);
     return {
       bg: active ? "#95BF74" : "transparent",
-      color: "#ffffff",
+      color: "--deep-gr-txt",
       _hover: {
         bg: "#95BF74",
-        color: "#ffffff",
+        color: "--deep-gr-txt",
       },
     };
   };
@@ -81,7 +81,7 @@ export default function Navbar() {
                   >
                     My Trails
                   </Button>
-                  <Text>Welcome {user?.fullName}!</Text>
+                  <Text color={"--deep-gr-txt"} fontWeight={"600"}>Welcome {user?.fullName}!</Text>
                   <Button
                     leftIcon={<Icon as={LogOut} />}
                     onClick={handleLogout}
@@ -160,7 +160,7 @@ export default function Navbar() {
                     >
                       My Trails
                     </Button>
-                    <Text >Welcome, {user?.fullName}!</Text>
+                    <Text color={"#FFF"} >Welcome, {user?.fullName}!</Text>
                     <Button
                       leftIcon={<Icon as={LogOut} />}
                       onClick={() => {

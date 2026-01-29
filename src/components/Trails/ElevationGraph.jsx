@@ -5,15 +5,11 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 export default function ElevationGraph({ waypoints, totalAscent, totalDescent }) {
   if (!waypoints || waypoints.length === 0) return null;
 
-  // Filter waypoints that have elevation data
+
   const waypointsWithElevation = waypoints.filter(wp => wp.elevation !== null && wp.elevation !== undefined);
   
   if (waypointsWithElevation.length === 0) return null;
-
-  // Sort by order to ensure correct sequence
   const sortedWaypoints = [...waypointsWithElevation].sort((a, b) => a.order - b.order);
-
-  // Find min and max elevation for scaling
   const elevations = sortedWaypoints.map(wp => wp.elevation);
   const minElevation = Math.min(...elevations);
   const maxElevation = Math.max(...elevations);
@@ -60,7 +56,6 @@ export default function ElevationGraph({ waypoints, totalAscent, totalDescent })
     return `M ${points.join(' L ')}`;
   };
 
-  // Create filled area path
   const createAreaPath = () => {
     if (sortedWaypoints.length === 0) return '';
 
@@ -81,12 +76,12 @@ export default function ElevationGraph({ waypoints, totalAscent, totalDescent })
     <Box>
       <HStack justify="space-between" fontSize="xs" color="purple.700" mb={2}>
         <Text fontWeight="medium">📈 Elevation Profile</Text>
-        <HStack spacing={3} fontSize="xs">
-          <HStack spacing={0.5} color="green.600">
+        <HStack spacing={1} fontSize="xs">
+          <HStack  color="green.600">
             <TrendingUp size={12} />
             <Text>{Math.round(totalAscent)}m</Text>
           </HStack>
-          <HStack spacing={0.5} color="red.500">
+          <HStack  color="red.500">
             <TrendingDown size={12} />
             <Text>{Math.round(totalDescent)}m</Text>
           </HStack>

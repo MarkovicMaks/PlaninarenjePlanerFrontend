@@ -47,21 +47,13 @@ export default function TrailExpandedMapSection({
           <Text fontSize="lg" fontWeight="bold">
             {name}
           </Text>
-          <HStack spacing={4} fontSize="sm" color="gray.600">
-            {typeof totalAscent === "number" &&
-              typeof totalDescent === "number" && (
-                <>
-                  <Text>⛰️ ↗ {Math.round(totalAscent)}m</Text>
-                  <Text>⛰️ ↘ {Math.round(totalDescent)}m</Text>
-                </>
-              )}
-          </HStack>
+          
         </VStack>
 
         <Button
           size="sm"
           leftIcon={<X size={16} />}
-          variant="unstyled"
+          variant="outline"
           onClick={(e) => {
             e.stopPropagation();
             onClose?.();

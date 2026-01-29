@@ -16,8 +16,6 @@ import { trailService } from "../services/trailService.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import Navbar from "../components/Navbar.jsx";
 import TrailCard from "../components/Trails/TrailCard.jsx";
-import TrailMap from "../components/Trails/TrailMap.jsx";
-import ElevationGraph from "../components/Trails/ElevationGraph.jsx";
 
 const TRAILS_PER_PAGE = 10;
 
@@ -111,7 +109,7 @@ export default function MyTrailsPage() {
         <VStack align="stretch" spacing={6}>
           {/* Header */}
           <Box>
-            <Text fontSize="2xl" fontWeight="bold" color="gray.800">
+            <Text fontSize="2xl" fontWeight="bold" color="#283f3b">
               My Created Trails
             </Text>
             <Text color="gray.600">

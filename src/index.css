@@ -9,9 +9,10 @@
   --card-bg-selected: #EFE6D2;
   --card-border: #e2e2e2;
   --card-border-selected: #3182ce; /* Chakra blue.500 */
+  --deep-gr-txt: #283f3b;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: #283f3b;
   background: url("./assets/svg/layered-peaks-haikei.svg") center / cover
     no-repeat;
 
@@ -105,13 +106,13 @@ button:focus-visible {
 }
 
 .NavbarButton{
-  color: #FAF9F4;
+  color: var(--deep-gr-txt);
   background: transparent;
   text-decoration: none;
 }
 
 .NavbarButton:hover {
-  color: #ffffff;
+  color: var(--deep-gr-txt);
   background: #95BF74;
   text-decoration: none;
 }
