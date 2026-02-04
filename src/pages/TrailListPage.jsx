@@ -249,7 +249,7 @@ export default function TrailListPage() {
                       leftIcon={<ChevronLeft size={16} />}
                       onClick={goToPrevPage}
                       disabled={currentPage === 1}
-                      variant="Ghost"
+                      variant="ghost"
                     >
                       Previous
                     </Button>
