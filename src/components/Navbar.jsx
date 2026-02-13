@@ -104,7 +104,7 @@ export default function Navbar() {
                         border="1px solid"
                         borderColor="gray.200"
                         p={1}
-                        zIndex={1000}
+                        zIndex={9999}
                         position="fixed"
                         mt="10px"
                       >
