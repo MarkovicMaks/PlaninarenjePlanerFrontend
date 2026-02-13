@@ -189,7 +189,7 @@ const InicialMap = ({ onRouteInfo, onRouteCreated, onWaypointsChange, shouldCrea
 
           <Overlay name="Biome slojevi">
             <TileLayer
-              url="http://localhost:8080/lulc_tiles/{z}/{x}/{y}.png"
+              url="http://130.61.255.30:8080/lulc_tiles/{z}/{x}/{y}.png"
               opacity={0.65}
               tms={false}
             />
