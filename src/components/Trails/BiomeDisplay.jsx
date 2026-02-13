@@ -18,13 +18,13 @@ const getBiomeColor = (biomeType) => {
 // Human-readable biome names
 const getBiomeName = (biomeType) => {
   const names = {
-    zimzelena: '🌲 Evergreen',
-    listopadna: '🍂 Deciduous',
-    livade: '🌾 Grassland',
-    urbano: '🏘️ Urban',
-    polja: '🌾 Fields',
-    vode: '💧 Water',
-    nepoznato: '❓ Unknown'
+    zimzelena: 'Zimzelena Šuma',
+    listopadna: 'Listopadna Šuma',
+    livade: 'Livade',
+    urbano: 'Urbano Područje',
+    polja: 'Polja',
+    vode: 'Voda',
+    nepoznato: 'Unknown'
   };
   return names[biomeType] || biomeType;
 };

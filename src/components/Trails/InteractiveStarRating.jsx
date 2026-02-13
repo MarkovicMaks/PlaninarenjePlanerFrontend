@@ -129,12 +129,6 @@ export default function InteractiveStarRating({
             {rating.toFixed(1)} avg • {totalRatings} rating{totalRatings !== 1 ? 's' : ''}
           </Text>
         )}
-        
-        {isAuthenticated && !userRating && (
-          <Text color="blue.600" fontSize="xs">
-            Click to rate
-          </Text>
-        )}
       </HStack>
     </VStack>
   );

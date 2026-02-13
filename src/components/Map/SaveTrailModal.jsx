@@ -142,7 +142,7 @@ export default function SaveTrailModal({
             onClick={handleClose} // click backdrop to close
           >
             <Box
-              bg="white"
+              bg="#FAF9F4"
               borderRadius="md"
               p={6}
               maxW="500px"
@@ -209,6 +209,7 @@ export default function SaveTrailModal({
                       padding: "8px",
                       borderRadius: "4px",
                       border: "1px solid #e2e8f0",
+                      color: "#e2e8f0",
                     }}
                     disabled={loading}
                   >
